@@ -110,3 +110,17 @@ pub enum Status {
     Suspended
 }
 
+#[cfg(test)]
+mod tests {
+    use crate::presentation::item::PaymentDetailsItem;
+    use crate::presentation::item::PaymentDetails;
+    use crate::presentation::item::Status;
+
+    #[test]
+    fn translating_status_to_enum_status() {
+        let payment_details_model = PaymentDetails::new("Test".to_string(), 99.99, "Address".to_string(), 1);
+        let payment_details_item = PaymentDetailsItem::map_to_presentation(payment_details_model);
+
+        assert_eq!(payment_details_item.status, Status::Success);
+    }
+}
