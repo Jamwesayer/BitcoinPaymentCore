@@ -1,11 +1,11 @@
-extern crate bitcoincore_rpc;
-use bitcoincore_rpc::{bitcoin, Auth, Client, Error, RpcApi};
-
-use crate::data::entity::payment::{PaymentRequestEntity, GeneratedPaymentRequestEntity};
+use crate::data::blockchain_util as blockchain;
+use crate::data::database_util as database;
+use crate::data::entity::payment::{PaymentRequestEntity, GeneratedPaymentRequestEntity, PaymentDetailsEntity};
 
 // Payment
 pub trait IPaymentDatabaseDataSource<'a> {
-
+    fn insert_payment_window(&self, payment_window_entity: &PaymentRequestEntity) -> Result<GeneratedPaymentRequestEntity, String>;
+    fn check_payment_window_status(&self, label: &str) -> Result<PaymentDetailsEntity, String>;
 }
 
 pub struct PaymentDatabase {
@@ -18,11 +18,30 @@ impl<'a> PaymentDatabase {
 }
 
 impl<'a> IPaymentDatabaseDataSource<'a> for PaymentDatabase {
+    fn insert_payment_window(&self, payment_window_entity: &PaymentRequestEntity) -> Result<GeneratedPaymentRequestEntity, String> {
+        match database::insert_payment_window(payment_window_entity) {
+            Ok(generated_payment_request_entity) => Ok(generated_payment_request_entity),
+            Err(e) => Err(e.to_string())
+        }
+    }
+
+    fn check_payment_window_status(&self, label: &str) -> Result<PaymentDetailsEntity, String>{
+        if let Ok(payment_window) = database::check_payment_window_status(label) {
+            match database::get_store_wallet_by_id(&payment_window.id) {
+                Ok(store) => {
+                    Ok(PaymentDetailsEntity::new(payment_window.label, payment_window.amount, store.wallet_address, payment_window.status_id))
+                },
+                Err(e) => Err(e.to_string())
+            }
+
+        } else {
+            Err("Error".to_string())
+        }
+    }
 }
 
-pub trait IPaymentNetworkDataSource<'a> {
-    fn create_payment_window(&self, payment_window_entity: PaymentRequestEntity) -> GeneratedPaymentRequestEntity;
-    // fn sendRefund(&self, origin: Address);
+pub trait IPaymentNetworkDataSource {
+    fn send_refund(&self, label: &str) -> Result<String, String>;
 }
 
 pub struct PaymentNetwork {}
@@ -33,24 +52,14 @@ impl PaymentNetwork {
     }
 }
 
-impl<'a> IPaymentNetworkDataSource<'a> for PaymentNetwork {
+impl IPaymentNetworkDataSource for PaymentNetwork {
 
-    fn create_payment_window(&self, payment_window_entity: PaymentRequestEntity) -> GeneratedPaymentRequestEntity {
-        //let address = open_connection().get_new_address(payment_window_entity.get_label(), None).unwrap();
-        let address: String="tet".to_string();
-        GeneratedPaymentRequestEntity::new(Some(payment_window_entity.get_label().unwrap().to_string()), *payment_window_entity.get_amount(), address)
+    fn send_refund(&self, label: &str) -> Result<String, String> {
+        match database::get_payment_window_by_label(label) {
+            Ok(_) => {
+                blockchain::refund(label)
+            },
+            Err(e) => Err(e.to_string())
+        }
     }
-}
-//
-// pub struct PaymentDatabase {}
-//
-// impl IPaymentDataSource for PaymentDatabase {
-//
-// fn create_payment_window(&self, _: data::entity::payment::PaymentRequestEntity<'_>) { todo!() }
-// }
-
-fn open_connection() -> bitcoincore_rpc::Client {
-    return Client::new("http://localhost:18443".to_string(),
-                          Auth::UserPass("test".to_string(),
-                                         "test".to_string())).unwrap();
 }

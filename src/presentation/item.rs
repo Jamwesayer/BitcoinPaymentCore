@@ -1,21 +1,22 @@
-use crate::business::model::{PaymentRequest};
+use crate::business::model::{PaymentRequest, GeneratedPaymentRequest, PaymentDetails};
 
+#[derive(Debug, PartialEq)]
 pub struct PaymentRequestItem {
-    label: Option<String>,
+    label: String,
     amount: f32,
     store_id: i32
 }
 
 impl<'a> PaymentRequestItem {
-    pub fn new(label: Option<String>, amount: f32, store_id: i32) -> Self {
+    pub fn new(label: String, amount: f32, store_id: i32) -> Self {
         PaymentRequestItem {
             label: label,
             amount: amount,
             store_id: store_id
         }
     }
-    pub fn get_label(&self) -> Option<&str> {
-        Some(self.label.as_ref().unwrap().as_str())
+    pub fn get_label(&self) -> &str {
+        self.label.as_str()
     }
     pub fn get_amount(&self) -> &f32 {
         &self.amount
@@ -29,6 +30,38 @@ impl<'a> PaymentRequestItem {
     }
 
 }
+
+#[derive(Debug, PartialEq)]
+pub struct GeneratedPaymentRequestItem {
+    label: String,
+    amount: f32,
+    address: String
+}
+
+impl<'a> GeneratedPaymentRequestItem {
+    pub fn new(label: String, amount: f32, address: String) -> Self {
+        GeneratedPaymentRequestItem {
+            label: label,
+            amount: amount,
+            address: address
+        }
+    }
+    pub fn get_label(&self) -> &str {
+        self.label.as_str()
+    }
+    pub fn get_amount(&self) -> &f32 {
+        &self.amount
+    }
+    pub fn get_store_id(&self) -> &str {
+        &self.address.as_str()
+    }
+
+    pub fn map_to_presentation(model: GeneratedPaymentRequest) -> Self {
+        GeneratedPaymentRequestItem::new(model.get_label().to_string(), *model.get_amount(), model.get_address().to_string())
+    }
+
+}
+
 #[derive(Debug, PartialEq)]
 pub struct PaymentDetailsItem {
     address: String,

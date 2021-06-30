@@ -8,8 +8,7 @@ table! {
 table! {
     payment_window (id) {
         id -> Integer,
-        address -> Varchar,
-        label -> Nullable<Varchar>,
+        label -> Varchar,
         amount -> Float,
         date -> Date,
         payment_status_id -> Integer,
@@ -22,6 +21,7 @@ table! {
         id -> Integer,
         name -> Text,
         address -> Varchar,
+        wallet_address -> Varchar,
     }
 }
 
