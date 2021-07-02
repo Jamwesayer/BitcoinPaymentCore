@@ -28,9 +28,10 @@ table! {
 table! {
     transaction (id) {
         id -> Integer,
-        amount -> Float,
+        amount -> Double,
         hash -> Varchar,
         from_address -> Varchar,
+        date -> Datetime,
         transaction_type_id -> Integer,
         transaction_status_id -> Integer,
         payment_window_id -> Integer,

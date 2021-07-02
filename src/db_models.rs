@@ -1,11 +1,5 @@
-// #[derive(Queryable)]
-// pub struct PaymentWindow {
-//     pub id: i32,
-//     pub name: String
-// }
-
 use chrono;
-use crate::schema::{payment_window};
+use crate::schema::{payment_window, transaction};
 
 #[derive(Insertable)]
 #[table_name = "payment_window"]
@@ -31,4 +25,14 @@ pub struct Shop {
     pub name: String,
     pub address: String,
     pub wallet_address: String
+}
+
+#[derive(Insertable)]
+#[table_name = "transaction"]
+pub struct NewTransaction<'a> {
+    pub amount: &'a f64,
+    pub hash: &'a str,
+    pub from_address: &'a str,
+    pub date: chrono::NaiveDateTime,
+    pub payment_window_id: &'a i32
 }
