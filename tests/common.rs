@@ -9,7 +9,7 @@ pub struct MockPaymentDatabase {
 
 }
 
-impl<'a> IPaymentDatabaseDataSource<'a> for MockPaymentDatabase {
+impl IPaymentDatabaseDataSource for MockPaymentDatabase {
 
     fn insert_payment_window(&self, request_entity: &PaymentRequestEntity) -> std::result::Result<GeneratedPaymentRequestEntity, std::string::String> {
         if request_entity.get_label().eq("ThisShouldWork") {
@@ -25,6 +25,7 @@ impl<'a> IPaymentDatabaseDataSource<'a> for MockPaymentDatabase {
             Err("ThisIsAnError".to_string())
         }
     }
+fn get_payment_window_by_label(&self, _: &str) -> std::result::Result<(), std::string::String> { todo!() }
 }
 
 pub struct MockPaymentNetwork {
@@ -36,9 +37,9 @@ impl<'a> IPaymentNetworkDataSource for MockPaymentNetwork {
     fn send_refund(&self, _: &str) -> std::result::Result<std::string::String, std::string::String> { todo!() }
 }
 
-pub fn setup_correct_payment_repository() -> PaymentRepository<'static> {
+pub fn setup_correct_payment_repository() -> PaymentRepository {
     PaymentRepository {
-        payment_database_datasource: &MockPaymentDatabase {},
-        payment_network_datasource: &MockPaymentNetwork {}
+        payment_database_datasource: Box::new(MockPaymentDatabase {}),
+        payment_network_datasource: Box::new(MockPaymentNetwork {})
     }
 }

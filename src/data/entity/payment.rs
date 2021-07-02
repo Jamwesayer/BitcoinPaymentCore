@@ -8,7 +8,7 @@ pub struct PaymentRequestEntity {
     store_id: i32
 }
 
-impl<'a> PaymentRequestEntity {
+impl PaymentRequestEntity {
     pub fn map_to_entity(model: PaymentRequest) -> Self {
         PaymentRequestEntity {
             label: model.get_label().to_string(),
@@ -36,7 +36,7 @@ pub struct GeneratedPaymentRequestEntity {
     store_id: i32
 }
 
-impl<'a> GeneratedPaymentRequestEntity {
+impl GeneratedPaymentRequestEntity {
     pub fn new(label: String, amount: f32, address: String, store_id: i32) -> Self {
         Self {
             label: label,
@@ -73,7 +73,7 @@ pub struct PaymentDetailsEntity {
     status_id: i32
 }
 
-impl<'a> PaymentDetailsEntity {
+impl PaymentDetailsEntity {
     pub fn new(label: String, amount: f32, address: String, status_id: i32) -> Self {
         Self {
             label: label,

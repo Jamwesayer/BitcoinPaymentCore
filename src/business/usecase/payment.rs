@@ -1,11 +1,12 @@
 use crate::business::irepository::IPaymentRepository;
 use crate::presentation::item::{GeneratedPaymentRequestItem, PaymentDetailsItem, PaymentRequestItem};
+use crate::data::repository::payment::{PaymentRepository};
 
-pub struct PaymentUseCase<'a> {
-    payment_repository: &'a dyn IPaymentRepository
+pub struct PaymentUseCase {
+    payment_repository: Box<dyn IPaymentRepository>
 }
 
-impl<'a> PaymentUseCase<'a> {
+impl PaymentUseCase {
     pub fn create_payment_window(&self, payment_request_item: PaymentRequestItem) -> Result<GeneratedPaymentRequestItem, String> {
         match self.payment_repository.create_payment_window(payment_request_item.map_to_business()) {
             Ok(generated_payment_request_model) => Ok(GeneratedPaymentRequestItem::map_to_presentation(generated_payment_request_model)),
@@ -24,16 +25,20 @@ impl<'a> PaymentUseCase<'a> {
         self.payment_repository.refund(label)
     }
 
-    pub fn new(_payment_repository: &'a dyn IPaymentRepository) -> Self {
+    pub fn new(payment_repository: Box<dyn IPaymentRepository>) -> Self {
         Self {
-            payment_repository: _payment_repository
+            payment_repository: payment_repository
         }
     }
 
 }
 
-// fn new() -> self {
-//     return payment {
-//         paymentRepository: PaymentRepository {}
-//     }
-// }
+impl Default for PaymentUseCase {
+
+    fn default() -> Self {
+        Self {
+            payment_repository: Box::new(PaymentRepository::default())
+        }
+    }
+
+}
