@@ -66,8 +66,39 @@ impl IPaymentNetworkDataSource for PaymentNetwork {
         blockchain::refund(label)
     }
 }
+
+//------------------------------------------------------------------------------------------------- Transaction
+pub trait ITransactionNetworkDataSource: DynClone  {
+    fn follow_transactions_for_label(&self, label: &str, skip: i32) -> Result<(f64, Vec<TransactionEntity>), String>;
+}
+
+#[derive(Clone)]
+pub struct TransactionNetwork {}
+
+impl Default for TransactionNetwork {
+    fn default() -> Self {
+        Self{}
+    }
+}
+
+use std::convert::TryInto;
+impl ITransactionNetworkDataSource for TransactionNetwork {
+    fn follow_transactions_for_label(&self, label: &str, skip: i32) -> Result<(f64, Vec<TransactionEntity>), String>{
+        match blockchain::get_all_transactions_for_address_by_label_with_total(&label, skip.try_into().unwrap()) {
+            Ok((total,transactions)) => {
+                let mut transaction_entities: Vec<TransactionEntity> = Vec::new();
+                for transaction in transactions {
+                    transaction_entities.push(
+                        TransactionEntity::new(
+                            transaction.detail.amount.as_btc(),
+                            transaction.info.txid.to_string(),
+                            transaction.detail.address.unwrap().to_string(),
+                            chrono::NaiveDateTime::from_timestamp(0, transaction.info.timereceived.try_into().unwrap())
+                    ))
+                }
+                Ok((total, transaction_entities))
             },
-            Err(e) => Err(e.to_string())
+            Err(e) => Err(e)
         }
     }
 }
