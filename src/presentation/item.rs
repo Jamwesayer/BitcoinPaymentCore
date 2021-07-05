@@ -1,4 +1,4 @@
-use crate::business::model::{PaymentRequest, GeneratedPaymentRequest, PaymentDetails};
+use crate::business::model::*;
 
 #[derive(Debug, PartialEq)]
 pub struct PaymentRequestItem {

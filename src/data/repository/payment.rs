@@ -1,7 +1,7 @@
 use crate::data::idatasource::{IPaymentNetworkDataSource, IPaymentDatabaseDataSource, PaymentNetwork, PaymentDatabase};
 use crate::data::entity::payment::{PaymentRequestEntity};
 use crate::business::irepository::{IPaymentRepository};
-use crate::business::model::{PaymentRequest, GeneratedPaymentRequest, PaymentDetails};
+use crate::business::model::*;
 
 pub struct PaymentRepository {
     pub payment_network_datasource: Box<dyn IPaymentNetworkDataSource>,

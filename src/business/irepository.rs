@@ -1,4 +1,4 @@
-use crate::business::model::{PaymentRequest, GeneratedPaymentRequest, PaymentDetails};
+use crate::business::model::*;
 
 pub trait IPaymentRepository {
     /// Returns Result<GeneratedPaymentRequest, String>

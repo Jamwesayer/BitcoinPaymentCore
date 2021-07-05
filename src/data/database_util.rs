@@ -1,5 +1,4 @@
-use crate::db_models::NewPaymentRequest;
-use crate::db_models::{PaymentWindow, Shop};
+use crate::db_models::*;
 use dotenv::dotenv;
 use std::env;
 use diesel::MysqlConnection;
@@ -7,7 +6,8 @@ use diesel::prelude::*;
 use diesel::result::Error::*;
 use diesel::result::Error;
 
-use super::entity::payment::{GeneratedPaymentRequestEntity, PaymentRequestEntity};
+use super::entity::payment::*;
+use super::entity::transaction::*;
 
 /// Creates a connection to the database
 pub fn establish_connection() -> MysqlConnection {
