@@ -83,3 +83,43 @@ impl<'a> PaymentDetails {
         &self.status_id
     }
 }
+
+use chrono::NaiveDateTime;
+
+// TransactionEntity
+#[derive(Debug, PartialEq, Clone)]
+pub struct Transaction {
+    amount: f64,
+    transaction_id: String,
+    origin_address: String,
+    transaction_type: i32,
+    time_received: NaiveDateTime
+}
+
+impl Transaction {
+    pub fn new(amount: f64, transaction_id: String, origin_address: String, transaction_type: i32, time_received: NaiveDateTime) -> Self {
+        Self {
+            amount: amount,
+            transaction_id: transaction_id,
+            origin_address: origin_address,
+            transaction_type: transaction_type,
+            time_received: time_received
+        }
+    }
+    pub fn get_amount(&self) -> &f64 {
+        &self.amount
+    }
+
+    pub fn get_transaction_id(&self) -> &str {
+        self.transaction_id.as_str()
+    }
+    pub fn get_time_received(&self) -> &NaiveDateTime {
+        &self.time_received
+    }
+    pub fn get_transaction_type(&self) -> &i32 {
+        &self.transaction_type
+    }
+    pub fn get_origin_address(&self) -> &str {
+        self.origin_address.as_str()
+    }
+}

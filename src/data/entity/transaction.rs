@@ -1,6 +1,7 @@
+use crate::business::model::Transaction;
 use chrono::NaiveDateTime;
 
-// PaymentRequestEntity
+// TransactionEntity
 #[derive(Debug, PartialEq)]
 pub struct TransactionEntity {
     amount: f64,

@@ -1,3 +1,4 @@
+use chrono::NaiveDateTime;
 use crate::business::model::*;
 
 #[derive(Debug, PartialEq)]
@@ -109,6 +110,47 @@ pub enum Status {
     Pending,
     Suspended
 }
+
+#[derive(Debug)]
+pub struct TransactionItem {
+    amount: f64,
+    transaction_id: String,
+    origin_address: String,
+    time_received: NaiveDateTime
+}
+
+impl TransactionItem {
+    pub fn new(amount: f64, transaction_id: String, origin_address: String, time_received: NaiveDateTime) -> Self {
+        Self {
+            amount: amount,
+            transaction_id: transaction_id,
+            origin_address: origin_address,
+            time_received: time_received
+        }
+    }
+    pub fn map_to_presentation(model: Transaction) -> Self {
+        TransactionItem::new(*model.get_amount(), model.get_transaction_id().to_string(), model.get_origin_address().to_string(), *model.get_time_received())
+    }
+
+    pub fn get_amount(&self) -> &f64 {
+        &self.amount
+    }
+
+    pub fn get_transaction_id(&self) -> &str {
+        self.transaction_id.as_str()
+    }
+    pub fn get_time_received(&self) -> &NaiveDateTime {
+        &self.time_received
+    }
+    pub fn get_origin_address(&self) -> &str {
+        self.origin_address.as_str()
+    }
+}
+
+
+
+
+// ---------------------------------------- TEST
 
 #[cfg(test)]
 mod tests {
