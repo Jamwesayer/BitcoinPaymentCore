@@ -26,7 +26,9 @@ pub trait IPaymentRepository {
     /// # Arguments
     ///
     /// * `label` - A &str which will be used to identify the specific label for which the payments has been done
-    fn refund(&self, label: &str) -> Result<String, String>;
+    fn refund(&self, label: &str) -> Result<Vec<Transaction>, String>;
+
+    fn suspend_payment_window(&self, label: &str) -> Result<(), String>;
 }
 
 use async_trait::async_trait;
@@ -37,14 +39,14 @@ pub trait ITransactionRepository {
     /// # Arguments
     ///
     /// * `label` - A &str which will be used to identify the transactions that need to be followed
-    async fn follow_transactions_for_label(&self, label: String);
+    async fn follow_transactions_for_label(&self, label: String, amount: f64, store_id: i32);
 
     /// Find a specific transaction by it's transaction_id
     ///
     /// # Arguments
     ///
     /// * `transaction_id` - A &str which species the to search transaction
-    fn find_transaction_by_id(&self, transaction_id: &str);
+    fn find_transaction_by_id(&self, transaction_id: &str) -> Result<Transaction, String>;
 
     /// Returns all transactions for a certain identifier
     ///
@@ -53,5 +55,5 @@ pub trait ITransactionRepository {
     /// * `label` - A &str to identify the incoming transactions
     fn get_all_transactions(&self, label: &str);
 
-    fn save_transaction_to_database(&self);
+    fn save_transaction_to_database(&self, label: &str, transactions: Vec<Transaction>) -> Result<(), String>;
 }
