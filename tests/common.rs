@@ -1,3 +1,7 @@
+use payment_core::data::entity::transaction::TransactionEntity;
+use payment_core::data::repository::transaction::TransactionRepository;
+use payment_core::data::idatasource::ITransactionNetworkDataSource;
+use payment_core::data::idatasource::ITransactionDatabaseDataSource;
 use payment_core::data::repository::payment::PaymentRepository;
 use payment_core::data::idatasource::IPaymentNetworkDataSource;
 use payment_core::data::entity::payment::PaymentDetailsEntity;
@@ -25,7 +29,20 @@ impl IPaymentDatabaseDataSource for MockPaymentDatabase {
             Err("ThisIsAnError".to_string())
         }
     }
-fn get_payment_window_by_label(&self, _: &str) -> std::result::Result<(), std::string::String> { todo!() }
+    fn get_payment_window_by_label(&self, label: &str) -> std::result::Result<(), std::string::String> {
+        if label == "ThisShouldWork" {
+            Ok(())
+        } else {
+            Err("ThisIsAnError".to_string())
+        }
+    }
+    fn suspend_payment_window(&self, label: &str) -> std::result::Result<(), std::string::String> {
+        if label == "ThisShouldWork" {
+            Ok(())
+        } else {
+            Err("ThisIsAnError".to_string())
+        }
+    }
 }
 
 pub struct MockPaymentNetwork {
@@ -33,13 +50,33 @@ pub struct MockPaymentNetwork {
 }
 
 impl<'a> IPaymentNetworkDataSource for MockPaymentNetwork {
-
-    fn send_refund(&self, _: &str) -> std::result::Result<std::string::String, std::string::String> { todo!() }
+    fn send_refund(&self, _: &str) -> std::result::Result<std::vec::Vec<payment_core::data::entity::transaction::TransactionEntity>, std::string::String> { todo!() }
 }
 
+pub struct MockTransactionDatabase {
+
+}
+
+impl ITransactionDatabaseDataSource for MockTransactionDatabase {
+    fn save_transaction(&self, _: &str, _: std::vec::Vec<payment_core::data::entity::transaction::TransactionEntity>) -> std::result::Result<(), std::string::String> { todo!() }
+    fn get_transaction_by_transaction_id(&self, _: &str) -> std::result::Result<payment_core::data::entity::transaction::TransactionEntity, std::string::String> { todo!() }
+    fn get_all_transactions(&self, _: &str) -> std::result::Result<std::vec::Vec<payment_core::data::entity::transaction::TransactionEntity>, std::string::String> { todo!() }
+}
+
+#[derive(Clone)]
+pub struct MockTransactionNetwork {
+
+}
+
+impl ITransactionNetworkDataSource for MockTransactionNetwork {
+    fn follow_transactions_for_label(&self, _: &str, _: i32) -> std::result::Result<(f64, std::vec::Vec<TransactionEntity>), String> { todo!() }
+}
+
+// --------------------------- FUNCTIONS
 pub fn setup_correct_payment_repository() -> PaymentRepository {
-    PaymentRepository {
-        payment_database_datasource: Box::new(MockPaymentDatabase {}),
-        payment_network_datasource: Box::new(MockPaymentNetwork {})
-    }
+    PaymentRepository::new(Box::new(MockPaymentNetwork {}), Box::new(MockPaymentDatabase {}))
+}
+
+pub fn setup_correct_transaction_repository() -> TransactionRepository {
+    TransactionRepository::new(Box::new(MockTransactionNetwork {}),Box::new(MockTransactionDatabase {}))
 }
