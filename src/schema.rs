@@ -9,7 +9,7 @@ table! {
     payment_window (id) {
         id -> Integer,
         label -> Varchar,
-        amount -> Float,
+        amount -> Double,
         date -> Date,
         payment_status_id -> Integer,
         store_id -> Integer,

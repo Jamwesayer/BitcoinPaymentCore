@@ -2,12 +2,12 @@
 #[derive(Debug, PartialEq)]
 pub struct PaymentRequest {
     label: String,
-    amount: f32,
+    amount: f64,
     store_id: i32
 }
 
 impl<'a> PaymentRequest {
-    pub fn new(label: String, amount: f32, store_id: i32) -> Self {
+    pub fn new(label: String, amount: f64, store_id: i32) -> Self {
         PaymentRequest {
             label: label,
             amount: amount,
@@ -17,7 +17,7 @@ impl<'a> PaymentRequest {
     pub fn get_label(&self) -> &str {
         self.label.as_str()
     }
-    pub fn get_amount(&self) -> &f32 {
+    pub fn get_amount(&self) -> &f64 {
         &self.amount
     }
     pub fn get_store_id(&self) -> &i32 {
@@ -30,12 +30,12 @@ impl<'a> PaymentRequest {
 #[derive(Debug, PartialEq)]
 pub struct GeneratedPaymentRequest {
     label: String,
-    amount: f32,
+    amount: f64,
     address: String
 }
 
 impl<'a> GeneratedPaymentRequest {
-    pub fn new(label: String, amount: f32, address: String) -> Self {
+    pub fn new(label: String, amount: f64, address: String) -> Self {
         GeneratedPaymentRequest {
             label: label,
             amount: amount,
@@ -45,7 +45,7 @@ impl<'a> GeneratedPaymentRequest {
     pub fn get_label(&self) -> &str {
         self.label.as_str()
     }
-    pub fn get_amount(&self) -> &f32 {
+    pub fn get_amount(&self) -> &f64 {
         &self.amount
     }
     pub fn get_address(&self) -> &str {
@@ -57,12 +57,12 @@ impl<'a> GeneratedPaymentRequest {
 pub struct PaymentDetails {
     address: String,
     label: String,
-    amount: f32,
+    amount: f64,
     status_id: i32
 }
 
 impl<'a> PaymentDetails {
-    pub fn new(label: String, amount: f32, address: String, status_id: i32) -> Self {
+    pub fn new(label: String, amount: f64, address: String, status_id: i32) -> Self {
         Self {
             label: label,
             amount: amount,
@@ -73,7 +73,7 @@ impl<'a> PaymentDetails {
     pub fn get_label(&self) -> &str {
         self.label.as_str()
     }
-    pub fn get_amount(&self) -> &f32 {
+    pub fn get_amount(&self) -> &f64 {
         &self.amount
     }
     pub fn get_address(&self) -> &str {

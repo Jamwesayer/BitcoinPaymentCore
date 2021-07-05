@@ -3,12 +3,12 @@ use crate::business::model::*;
 #[derive(Debug, PartialEq)]
 pub struct PaymentRequestItem {
     label: String,
-    amount: f32,
+    amount: f64,
     store_id: i32
 }
 
 impl<'a> PaymentRequestItem {
-    pub fn new(label: String, amount: f32, store_id: i32) -> Self {
+    pub fn new(label: String, amount: f64, store_id: i32) -> Self {
         PaymentRequestItem {
             label: label,
             amount: amount,
@@ -18,7 +18,7 @@ impl<'a> PaymentRequestItem {
     pub fn get_label(&self) -> &str {
         self.label.as_str()
     }
-    pub fn get_amount(&self) -> &f32 {
+    pub fn get_amount(&self) -> &f64 {
         &self.amount
     }
     pub fn get_store_id(&self) -> &i32 {
@@ -34,12 +34,12 @@ impl<'a> PaymentRequestItem {
 #[derive(Debug, PartialEq)]
 pub struct GeneratedPaymentRequestItem {
     label: String,
-    amount: f32,
+    amount: f64,
     address: String
 }
 
 impl<'a> GeneratedPaymentRequestItem {
-    pub fn new(label: String, amount: f32, address: String) -> Self {
+    pub fn new(label: String, amount: f64, address: String) -> Self {
         GeneratedPaymentRequestItem {
             label: label,
             amount: amount,
@@ -49,7 +49,7 @@ impl<'a> GeneratedPaymentRequestItem {
     pub fn get_label(&self) -> &str {
         self.label.as_str()
     }
-    pub fn get_amount(&self) -> &f32 {
+    pub fn get_amount(&self) -> &f64 {
         &self.amount
     }
     pub fn get_store_id(&self) -> &str {
@@ -66,12 +66,12 @@ impl<'a> GeneratedPaymentRequestItem {
 pub struct PaymentDetailsItem {
     address: String,
     label: String,
-    amount: f32,
+    amount: f64,
     status: Status
 }
 
 impl<'a> PaymentDetailsItem {
-    pub fn new(label: String, amount: f32, address: String, status_id: i32) -> Self {
+    pub fn new(label: String, amount: f64, address: String, status_id: i32) -> Self {
         let _status = match status_id {
             1 => Status::Success,
             2 => Status::Failed,
@@ -88,7 +88,7 @@ impl<'a> PaymentDetailsItem {
     pub fn get_label(&self) -> &str {
         self.label.as_str()
     }
-    pub fn get_amount(&self) -> &f32 {
+    pub fn get_amount(&self) -> &f64 {
         &self.amount
     }
     pub fn get_address(&self) -> &str {

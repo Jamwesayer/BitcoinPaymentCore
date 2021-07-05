@@ -5,7 +5,7 @@ use crate::schema::{payment_window, transaction};
 #[table_name = "payment_window"]
 pub struct NewPaymentRequest<'a> {
     pub label: &'a str,
-    pub amount: &'a f32,
+    pub amount: &'a f64,
     pub store_id: &'a i32
 }
 
@@ -13,7 +13,7 @@ pub struct NewPaymentRequest<'a> {
 pub struct PaymentWindow {
     pub id: i32,
     pub label: String,
-    pub amount: f32,
+    pub amount: f64,
     pub date: chrono::NaiveDate,
     pub status_id: i32,
     pub store_id: i32

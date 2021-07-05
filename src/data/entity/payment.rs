@@ -4,7 +4,7 @@ use crate::business::model::{PaymentRequest, GeneratedPaymentRequest, PaymentDet
 #[derive(Debug, PartialEq)]
 pub struct PaymentRequestEntity {
     label: String,
-    amount: f32,
+    amount: f64,
     store_id: i32
 }
 
@@ -19,7 +19,7 @@ impl PaymentRequestEntity {
     pub fn get_label(&self) -> &str {
         self.label.as_str()
     }
-    pub fn get_amount(&self) -> &f32 {
+    pub fn get_amount(&self) -> &f64 {
         &self.amount
     }
     pub fn get_store_id(&self) -> &i32 {
@@ -31,13 +31,13 @@ impl PaymentRequestEntity {
 #[derive(Debug, PartialEq)]
 pub struct GeneratedPaymentRequestEntity {
     label: String,
-    amount: f32,
+    amount: f64,
     address: String,
     store_id: i32
 }
 
 impl GeneratedPaymentRequestEntity {
-    pub fn new(label: String, amount: f32, address: String, store_id: i32) -> Self {
+    pub fn new(label: String, amount: f64, address: String, store_id: i32) -> Self {
         Self {
             label: label,
             amount: amount,
@@ -53,7 +53,7 @@ impl GeneratedPaymentRequestEntity {
     pub fn get_label(&self) -> &str {
         self.label.as_str()
     }
-    pub fn get_amount(&self) -> &f32 {
+    pub fn get_amount(&self) -> &f64 {
         &self.amount
     }
     pub fn get_address(&self) -> &str {
@@ -69,12 +69,12 @@ impl GeneratedPaymentRequestEntity {
 pub struct PaymentDetailsEntity {
     address: String,
     label: String,
-    amount: f32,
+    amount: f64,
     status_id: i32
 }
 
 impl PaymentDetailsEntity {
-    pub fn new(label: String, amount: f32, address: String, status_id: i32) -> Self {
+    pub fn new(label: String, amount: f64, address: String, status_id: i32) -> Self {
         Self {
             label: label,
             amount: amount,
@@ -85,7 +85,7 @@ impl PaymentDetailsEntity {
     pub fn get_label(&self) -> &str {
         self.label.as_str()
     }
-    pub fn get_amount(&self) -> &f32 {
+    pub fn get_amount(&self) -> &f64 {
         &self.amount
     }
     pub fn get_address(&self) -> &str {
