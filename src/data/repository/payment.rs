@@ -4,8 +4,8 @@ use crate::business::irepository::{IPaymentRepository};
 use crate::business::model::*;
 
 pub struct PaymentRepository {
-    pub payment_network_datasource: Box<dyn IPaymentNetworkDataSource>,
-    pub payment_database_datasource: Box<dyn IPaymentDatabaseDataSource>
+    payment_network_datasource: Box<dyn IPaymentNetworkDataSource>,
+    payment_database_datasource: Box<dyn IPaymentDatabaseDataSource>
 }
 
 impl PaymentRepository {
@@ -35,13 +35,33 @@ impl IPaymentRepository for PaymentRepository {
         }
     }
 
-    fn refund(&self, label: &str) -> Result<String, String> {
+    fn refund(&self, label: &str) -> Result<Vec<Transaction>, String> {
         match self.payment_database_datasource.get_payment_window_by_label(label) {
-            Ok(_) => self.payment_network_datasource.send_refund(label),
+            Ok(_) => {
+                match self.payment_network_datasource.send_refund(label) {
+                    Ok(transaction_entities) => {
+                        match self.payment_database_datasource.suspend_payment_window(label) {
+                            Ok(_) => {
+                                let mut transactions: Vec<Transaction> = Vec::new();
+                                for transaction_entity in transaction_entities {
+                                    transactions.push(transaction_entity.map_to_business())
+                                };
+                                Ok(transactions)
+                            },
+                            Err(e) => Err(e)
+                        }
+
+                    },
+                    Err(e) => Err(e)
+                }
+            },
             Err(e) => Err(e)
         }
     }
 
+    fn suspend_payment_window(&self, label: &str) -> Result<(), String> {
+        self.payment_database_datasource.suspend_payment_window(label)
+    }
 }
 
 // Set defaults

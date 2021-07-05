@@ -9,6 +9,7 @@ pub trait IPaymentDatabaseDataSource {
     fn insert_payment_window(&self, payment_window_entity: &PaymentRequestEntity) -> Result<GeneratedPaymentRequestEntity, String>;
     fn check_payment_window_status(&self, label: &str) -> Result<PaymentDetailsEntity, String>;
     fn get_payment_window_by_label(&self, label: &str) -> Result<(), String>;
+    fn suspend_payment_window(&self, label: &str) -> Result<(), String>;
 }
 
 pub struct PaymentDatabase {}
@@ -28,7 +29,7 @@ impl<'a> IPaymentDatabaseDataSource for PaymentDatabase {
     }
 
     fn check_payment_window_status(&self, label: &str) -> Result<PaymentDetailsEntity, String>{
-        if let Ok(payment_window) = database::check_payment_window_status(label) {
+        if let Ok(payment_window) = database::get_payment_window_by_label(label) {
             match database::get_store_wallet_by_id(&payment_window.store_id) {
                 Ok(store) => {
                     Ok(PaymentDetailsEntity::new(payment_window.label, payment_window.amount, store.wallet_address, payment_window.status_id))
@@ -46,10 +47,16 @@ impl<'a> IPaymentDatabaseDataSource for PaymentDatabase {
             Err(e) => Err(e.to_string())
         }
     }
+    fn suspend_payment_window(&self, label: &str) -> Result<(), String> {
+        match database::suspend_payment_window(label) {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e.to_string())
+        }
+    }
 }
 
 pub trait IPaymentNetworkDataSource {
-    fn send_refund(&self, label: &str) -> Result<String, String>;
+    fn send_refund(&self, label: &str) -> Result<Vec::<TransactionEntity>, String>;
 }
 
 pub struct PaymentNetwork {}
@@ -62,12 +69,53 @@ impl Default for PaymentNetwork {
 
 impl IPaymentNetworkDataSource for PaymentNetwork {
 
-    fn send_refund(&self, label: &str) -> Result<String, String> {
+    fn send_refund(&self, label: &str) -> Result<Vec::<TransactionEntity>, String> {
         blockchain::refund(label)
     }
 }
 
 //------------------------------------------------------------------------------------------------- Transaction
+pub trait ITransactionDatabaseDataSource {
+    fn save_transaction(&self, label: &str, transaction_entities: Vec::<TransactionEntity>) -> Result<(), String>;
+    fn get_transaction_by_transaction_id(&self, transaction_id: &str) -> Result<TransactionEntity, String>;
+    fn get_total_transactions_by_store_id(&self, store_id: &i32) -> Result<i64, String>;
+    fn get_all_transactions(&self, label: &str) -> Result<Vec<TransactionEntity>, String>;
+}
+
+pub struct TransactionDatabase {}
+
+impl Default for TransactionDatabase {
+    fn default() -> Self {
+        Self{}
+    }
+}
+
+impl ITransactionDatabaseDataSource for TransactionDatabase {
+    fn save_transaction(&self, label: &str, transaction_entities: Vec<TransactionEntity>) -> Result<(), String> {
+        match database::insert_transactions(label, transaction_entities) {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e.to_string())
+        }
+    }
+    fn get_transaction_by_transaction_id(&self, transaction_id: &str) -> Result<TransactionEntity, String> {
+        match database::get_transaction_by_transaction_id(transaction_id) {
+            Ok(transaction) => Ok(TransactionEntity::new(transaction.amount, transaction.hash, transaction.from_address, transaction.transaction_type_id, transaction.date)),
+            Err(e) => Err(e.to_string())
+        }
+    }
+
+    fn get_total_transactions_by_store_id(&self, store_id: &i32) -> Result<i64, String> {
+        match database::get_amount_of_transactions_for_shop(store_id) {
+            Ok(amount) => Ok(amount),
+            Err(e) => Err(e.to_string())
+        }
+    }
+
+    fn get_all_transactions(&self, label: &str) -> Result<Vec<TransactionEntity>, String> {
+        Err("test".to_string())
+    }
+}
+
 pub trait ITransactionNetworkDataSource: DynClone  {
     fn follow_transactions_for_label(&self, label: &str, skip: i32) -> Result<(f64, Vec<TransactionEntity>), String>;
 }
@@ -81,24 +129,8 @@ impl Default for TransactionNetwork {
     }
 }
 
-use std::convert::TryInto;
 impl ITransactionNetworkDataSource for TransactionNetwork {
     fn follow_transactions_for_label(&self, label: &str, skip: i32) -> Result<(f64, Vec<TransactionEntity>), String>{
-        match blockchain::get_all_transactions_for_address_by_label_with_total(&label, skip.try_into().unwrap()) {
-            Ok((total,transactions)) => {
-                let mut transaction_entities: Vec<TransactionEntity> = Vec::new();
-                for transaction in transactions {
-                    transaction_entities.push(
-                        TransactionEntity::new(
-                            transaction.detail.amount.as_btc(),
-                            transaction.info.txid.to_string(),
-                            transaction.detail.address.unwrap().to_string(),
-                            chrono::NaiveDateTime::from_timestamp(0, transaction.info.timereceived.try_into().unwrap())
-                    ))
-                }
-                Ok((total, transaction_entities))
-            },
-            Err(e) => Err(e)
-        }
+        blockchain::get_all_transactions_for_address_by_label_with_total(&label, skip)
     }
 }
