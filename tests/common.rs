@@ -60,6 +60,7 @@ pub struct MockTransactionDatabase {
 impl ITransactionDatabaseDataSource for MockTransactionDatabase {
     fn save_transaction(&self, _: &str, _: std::vec::Vec<payment_core::data::entity::transaction::TransactionEntity>) -> std::result::Result<(), std::string::String> { todo!() }
     fn get_transaction_by_transaction_id(&self, _: &str) -> std::result::Result<payment_core::data::entity::transaction::TransactionEntity, std::string::String> { todo!() }
+    fn get_total_transactions_by_store_id(&self, store_id: &i32) -> Result<i64, String>{todo!()}
     fn get_all_transactions(&self, _: &str) -> std::result::Result<std::vec::Vec<payment_core::data::entity::transaction::TransactionEntity>, std::string::String> { todo!() }
 }
 
