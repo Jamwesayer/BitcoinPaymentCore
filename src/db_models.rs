@@ -9,7 +9,8 @@ pub struct NewPaymentRequest<'a> {
     pub store_id: &'a i32
 }
 
-#[derive(Queryable)]
+#[derive(Identifiable, Queryable)]
+#[table_name = "payment_window"]
 pub struct PaymentWindow {
     pub id: i32,
     pub label: String,
@@ -33,6 +34,21 @@ pub struct NewTransaction<'a> {
     pub amount: &'a f64,
     pub hash: &'a str,
     pub from_address: &'a str,
-    pub date: chrono::NaiveDateTime,
+    pub date: &'a chrono::NaiveDateTime,
+    pub transaction_type_id: &'a i32,
     pub payment_window_id: &'a i32
+}
+
+#[derive(Identifiable, Queryable, Associations)]
+#[belongs_to(PaymentWindow. foreign_key="payment_window_id")]
+#[table_name = "transaction"]
+pub struct Transaction {
+    pub id: i32,
+    pub amount: f64,
+    pub hash: String,
+    pub from_address: String,
+    pub date: chrono::NaiveDateTime,
+    pub transaction_type_id: i32,
+    pub transaction_status_id: i32,
+    pub payment_window_id: i32
 }
