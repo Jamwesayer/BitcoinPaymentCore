@@ -60,3 +60,5 @@ allow_tables_to_appear_in_same_query!(
     transaction_status,
     transaction_type,
 );
+
+joinable!(transaction -> payment_window (payment_window_id));
