@@ -51,6 +51,7 @@ pub struct MockPaymentNetwork {
 
 impl<'a> IPaymentNetworkDataSource for MockPaymentNetwork {
     fn send_refund(&self, _: &str) -> std::result::Result<std::vec::Vec<payment_core::data::entity::transaction::TransactionEntity>, std::string::String> { todo!() }
+    fn create_payment_window(&self, label: &str) -> Result<String, String> { todo!() }
 }
 
 pub struct MockTransactionDatabase {
