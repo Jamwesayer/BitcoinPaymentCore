@@ -17,14 +17,12 @@ impl Default for PaymentControllerService {
 }
 
 impl PaymentControllerService {
-    pub async fn create_payment_window(&self, payment_request_item: PaymentRequestItem) {
-        let store_id = payment_request_item.get_store_id().clone();
-        match self.payment_usecase.create_payment_window(payment_request_item) {
-            Ok(generated_payment_request_item) => {
-                self.transaction_usecase.follow_transaction(generated_payment_request_item.get_label().to_string(), *generated_payment_request_item.get_amount(), store_id).await;
-            },
-            Err(e) => println!("test")
-        }
+    pub fn create_payment_window(&self, payment_request_item: PaymentRequestItem) -> Result<GeneratedPaymentRequestItem, String> {
+        self.payment_usecase.create_payment_window(payment_request_item)
+    }
+
+    pub async fn follow_transaction_for_label(&self, generated_payment_request_item: GeneratedPaymentRequestItem, store_id: i32) {
+        self.transaction_usecase.follow_transaction(generated_payment_request_item.get_label().to_string(), *generated_payment_request_item.get_amount(), store_id).await;
     }
 
     pub fn check_payment_status(&self, label: &str) -> Result<PaymentDetailsItem, String> {
