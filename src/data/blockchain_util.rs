@@ -11,7 +11,7 @@ fn open_connection() -> bitcoincore_rpc::Client {
                                          "test".to_string())).unwrap();
 }
 
-/// Returns Result<_, String>
+/// Import a watch only address
 ///
 /// Imports a public key to the systems, this allows it to check for transactions and handle transactions connected to the address accordingly
 ///
@@ -29,6 +29,20 @@ pub fn import_address(address: &str) -> Result<(), String> {
         Err(e) => Err(e.to_string())
     }
 
+}
+
+/// Create a address that is linked to a payment window by label
+///
+/// Imports a public key to the systems, this allows it to check for transactions and handle transactions connected to the address accordingly
+///
+/// # Arguments
+///
+/// * `label` - A &str which represents the label used to associate to the receiving address
+pub fn create_receiving_address(label: &str) -> Result<String, String> {
+    match open_connection().get_new_address(Some(label), None) {
+        Ok(address) => Ok(address.to_string()),
+        Err(e) => Err(e.to_string())
+    }
 }
 
 /// Returns Result<String, String>
@@ -62,44 +76,50 @@ pub fn refund(label: &str) -> Result<Vec::<TransactionEntity>, String> {
     }
 }
 
-/// Returns Result<Vec<bitcoincore_rpc_json::ListTransactionResult>, String>
-///
-/// It retrieves all address which are done to the given label
+/// Get the transactions that are linked to a certain receiving address by label
 ///
 /// # Arguments
 ///
-/// * `label` - A &str which will be used to identify the transactions with the "transaction_id"
+/// * `label` - A &str which will be used to identify the receiving address
+/// * `skip` - the amount of transaction to skip (to prevent double saving)
 fn get_all_transactions_for_address_by_label(label: &str, skip: Option<usize>) -> Result<Vec<bitcoincore_rpc_json::ListTransactionResult>, String> {
+    use bitcoincore_rpc_json::GetTransactionResultDetailCategory;
     match open_connection().list_transactions(Some(label), None, skip, None) {
         Ok(transactions) => {
-            let mut filtered_transactions: Vec<bitcoincore_rpc_json::ListTransactionResult> = Vec::new();
+            let mut filtered = Vec::new();
             for transaction in transactions {
-                if transaction.detail.label.eq(&Some(label.to_string())) {
-                    filtered_transactions.push(transaction);
+                if transaction.detail.category == GetTransactionResultDetailCategory::Receive {
+                    filtered.push(transaction);
                 }
             }
-            Ok(filtered_transactions)
+            Ok(filtered)
         },
         Err(e) => Err(e.to_string())
     }
 }
 
+/// Get the transactions that a linked to a certain receiving address by label and retrieve the amount total of transactions
+///
+/// # Arguments
+///
+/// * `label` - A &str which will be used to identify the receiving address
+/// * `skip` - the amount of transaction to skip (to prevent double saving)
 pub fn get_all_transactions_for_address_by_label_with_total(label: &str, skip: i32) -> Result<(f64, Vec<TransactionEntity>), String> {
+
     match get_all_transactions_for_address_by_label(label, Some(skip.try_into().unwrap())) {
         Ok(transactions) => {
             let mut transaction_entities: Vec<TransactionEntity> = Vec::new();
             let mut amount = 0.0;
             for transaction in &transactions {
-                transaction_entities.push(
-                    TransactionEntity::new(
-                        transaction.detail.amount.as_btc(),
-                        transaction.info.txid.to_string(),
-                        transaction.detail.address.as_ref().unwrap().to_string(),
-                        1,
-                        chrono::NaiveDateTime::from_timestamp(0, transaction.info.timereceived.try_into().unwrap())
-                    )
-                );
-                println!("{:?}", transaction.detail.amount.as_btc());
+                    transaction_entities.push(
+                        TransactionEntity::new(
+                            transaction.detail.amount.as_btc(),
+                            transaction.info.txid.to_string(),
+                            transaction.detail.address.as_ref().unwrap().to_string(),
+                            1,
+                            chrono::NaiveDateTime::from_timestamp(0, transaction.info.timereceived.try_into().unwrap())
+                        )
+                    );
                 amount += transaction.detail.amount.as_btc();
             };
             Ok((amount, transaction_entities))
