@@ -19,12 +19,18 @@ impl PaymentRepository {
 
 impl IPaymentRepository for PaymentRepository {
     fn create_payment_window(&self, payment_request: PaymentRequest) -> Result<GeneratedPaymentRequest, String> {
-        match self.payment_database_datasource.insert_payment_window(&PaymentRequestEntity::map_to_entity(payment_request)) {
-            Ok(generated_payment_request_entity) => {
-                Ok(generated_payment_request_entity.map_to_business())
+        match self.payment_network_datasource.create_payment_window(&payment_request.get_label()) {
+            Ok(address) => {
+                match self.payment_database_datasource.insert_payment_window(&PaymentRequestEntity::map_to_entity(payment_request)) {
+                    Ok(generated_payment_request_entity) => {
+                        Ok(generated_payment_request_entity.map_to_business(address))
+                    },
+                    Err(e) => Err(e)
+                }
             },
             Err(e) => Err(e)
         }
+
 
     }
 

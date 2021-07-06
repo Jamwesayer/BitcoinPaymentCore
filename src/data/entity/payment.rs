@@ -46,8 +46,8 @@ impl GeneratedPaymentRequestEntity {
         }
     }
 
-    pub fn map_to_business(&self) -> GeneratedPaymentRequest {
-        GeneratedPaymentRequest::new(self.get_label().to_string(), *self.get_amount(), self.get_address().to_string())
+    pub fn map_to_business(&self, address: String) -> GeneratedPaymentRequest {
+        GeneratedPaymentRequest::new(self.get_label().to_string(), *self.get_amount(), address)
     }
 
     pub fn get_label(&self) -> &str {
@@ -58,6 +58,9 @@ impl GeneratedPaymentRequestEntity {
     }
     pub fn get_address(&self) -> &str {
         &self.address
+    }
+    pub fn set_address(&mut self, address: String) {
+        self.address = address;
     }
     pub fn get_store_id(&self) -> &i32 {
         &self.store_id
