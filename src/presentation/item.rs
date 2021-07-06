@@ -53,7 +53,7 @@ impl<'a> GeneratedPaymentRequestItem {
     pub fn get_amount(&self) -> &f64 {
         &self.amount
     }
-    pub fn get_store_id(&self) -> &str {
+    pub fn get_address(&self) -> &str {
         &self.address.as_str()
     }
 
