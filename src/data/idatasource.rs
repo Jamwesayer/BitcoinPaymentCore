@@ -56,6 +56,7 @@ impl<'a> IPaymentDatabaseDataSource for PaymentDatabase {
 }
 
 pub trait IPaymentNetworkDataSource {
+    fn create_payment_window(&self, label: &str) -> Result<String, String>;
     fn send_refund(&self, label: &str) -> Result<Vec::<TransactionEntity>, String>;
 }
 
@@ -68,6 +69,13 @@ impl Default for PaymentNetwork {
 }
 
 impl IPaymentNetworkDataSource for PaymentNetwork {
+
+    fn create_payment_window(&self, label: &str) -> Result<String, String> {
+        match blockchain::create_receiving_address(label) {
+            Ok(address_string) => Ok(address_string),
+            Err(e) => Err(e.to_string())
+        }
+    }
 
     fn send_refund(&self, label: &str) -> Result<Vec::<TransactionEntity>, String> {
         blockchain::refund(label)
