@@ -4,6 +4,7 @@ use crate::data::idatasource::{ITransactionNetworkDataSource, ITransactionDataba
 use crate::business::irepository::{ITransactionRepository};
 
 use tokio::task;
+use async_trait::async_trait;
 
 pub struct TransactionRepository {
     transaction_network_datasource: Box<dyn ITransactionNetworkDataSource + Sync + Send>,
@@ -19,7 +20,6 @@ impl TransactionRepository {
     }
 }
 
-use async_trait::async_trait;
 #[async_trait]
 impl ITransactionRepository for TransactionRepository {
 
@@ -27,7 +27,7 @@ impl ITransactionRepository for TransactionRepository {
 
         // retrieve transactions from database linked to shop
 
-        let mut skip = self.transaction_database_datasource.get_total_transactions_by_store_id(&store_id);
+        let mut skip = 0;
         let expected_amount = amount;
         let mut total_amount = 0.0;
 
@@ -35,15 +35,11 @@ impl ITransactionRepository for TransactionRepository {
 
         task::spawn(async move {
 
-            let mut skip = 0; // == amount of transaction for paymentwindows for the shopid
-
             loop {
                 match network_instance.follow_transactions_for_label(&label, skip) {
                     Ok((amount, transactions)) => {
                         // save transactions to database with db ds
                         // save_transaction_to_database()
-
-
                         skip += transactions.len() as i32;
                         if total_amount >= expected_amount {
                             println!("Amount is correct {}", label);
