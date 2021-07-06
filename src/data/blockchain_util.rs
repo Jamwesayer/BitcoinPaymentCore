@@ -117,7 +117,7 @@ pub fn get_all_transactions_for_address_by_label_with_total(label: &str, skip: i
                             transaction.info.txid.to_string(),
                             transaction.detail.address.as_ref().unwrap().to_string(),
                             1,
-                            chrono::NaiveDateTime::from_timestamp(0, transaction.info.timereceived.try_into().unwrap())
+                            chrono::NaiveDateTime::from_timestamp(transaction.info.timereceived.try_into().unwrap(), 0)
                         )
                     );
                 amount += transaction.detail.amount.as_btc();
