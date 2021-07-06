@@ -83,13 +83,14 @@ impl IPaymentNetworkDataSource for PaymentNetwork {
 }
 
 //------------------------------------------------------------------------------------------------- Transaction
-pub trait ITransactionDatabaseDataSource {
+pub trait ITransactionDatabaseDataSource: DynClone {
     fn save_transaction(&self, label: &str, transaction_entities: Vec::<TransactionEntity>) -> Result<(), String>;
     fn get_transaction_by_transaction_id(&self, transaction_id: &str) -> Result<TransactionEntity, String>;
     fn get_total_transactions_by_store_id(&self, store_id: &i32) -> Result<i64, String>;
     fn get_all_transactions(&self, label: &str) -> Result<Vec<TransactionEntity>, String>;
 }
 
+#[derive(Clone)]
 pub struct TransactionDatabase {}
 
 impl Default for TransactionDatabase {

@@ -32,6 +32,7 @@ impl ITransactionRepository for TransactionRepository {
         let mut total_amount = 0.0;
 
         let network_instance = dyn_clone::clone_box(&*self.transaction_network_datasource);
+        let database_instance = dyn_clone::clone_box(&*self.transaction_database_datasource);
 
         task::spawn(async move {
 
@@ -46,7 +47,9 @@ impl ITransactionRepository for TransactionRepository {
                             break;
                         } else {
                             if transactions.len() > 0 {
+                                println!("{:?}", amount);
                                 total_amount += amount;
+                                database_instance.save_transaction(&label, transactions);
                                 println!("Amount: {}, for label: {}", amount, label);
                             }
                         }
