@@ -6,7 +6,7 @@ pub struct PaymentRequest {
     store_id: i32
 }
 
-impl<'a> PaymentRequest {
+impl PaymentRequest {
     pub fn new(label: String, amount: f64, store_id: i32) -> Self {
         PaymentRequest {
             label: label,
@@ -26,6 +26,28 @@ impl<'a> PaymentRequest {
 
 }
 
+#[derive(Debug, PartialEq, Clone)]
+pub struct PaymentWindowSearch {
+    label: String,
+    store_id: i32
+}
+
+impl PaymentWindowSearch {
+    pub fn new(label: String, store_id: i32) -> Self {
+        PaymentWindowSearch {
+            label: label,
+            store_id: store_id
+        }
+    }
+    pub fn get_label(&self) -> &str {
+        self.label.as_str()
+    }
+    pub fn get_store_id(&self) -> &i32 {
+        &self.store_id
+    }
+
+}
+
 // GeneratedPaymentRequest
 #[derive(Debug, PartialEq)]
 pub struct GeneratedPaymentRequest {
@@ -34,7 +56,7 @@ pub struct GeneratedPaymentRequest {
     address: String
 }
 
-impl<'a> GeneratedPaymentRequest {
+impl GeneratedPaymentRequest {
     pub fn new(label: String, amount: f64, address: String) -> Self {
         GeneratedPaymentRequest {
             label: label,
@@ -61,7 +83,7 @@ pub struct PaymentDetails {
     status_id: i32
 }
 
-impl<'a> PaymentDetails {
+impl PaymentDetails {
     pub fn new(label: String, amount: f64, address: String, status_id: i32) -> Self {
         Self {
             label: label,

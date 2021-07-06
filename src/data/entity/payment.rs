@@ -1,4 +1,4 @@
-use crate::business::model::{PaymentRequest, GeneratedPaymentRequest, PaymentDetails};
+use crate::business::model::*;
 
 // PaymentRequestEntity
 #[derive(Debug, PartialEq)]
@@ -24,6 +24,33 @@ impl PaymentRequestEntity {
     }
     pub fn get_store_id(&self) -> &i32 {
         &self.store_id
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct PaymentWindowSearchEntity {
+    label: String,
+    store_id: i32
+}
+
+impl PaymentWindowSearchEntity {
+    pub fn new(label: String, store_id: i32) -> Self {
+        PaymentWindowSearchEntity {
+            label: label,
+            store_id: store_id
+        }
+    }
+    pub fn get_label(&self) -> &str {
+        self.label.as_str()
+    }
+    pub fn get_store_id(&self) -> &i32 {
+        &self.store_id
+    }
+    pub fn map_to_entity(model: PaymentWindowSearch) -> Self {
+        PaymentWindowSearchEntity {
+            label: model.get_label().to_string(),
+            store_id: *model.get_store_id()
+        }
     }
 }
 
