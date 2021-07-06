@@ -1,5 +1,5 @@
 use crate::data::idatasource::{IPaymentNetworkDataSource, IPaymentDatabaseDataSource, PaymentNetwork, PaymentDatabase};
-use crate::data::entity::payment::{PaymentRequestEntity};
+use crate::data::entity::payment::*;
 use crate::business::irepository::{IPaymentRepository};
 use crate::business::model::*;
 
@@ -34,19 +34,20 @@ impl IPaymentRepository for PaymentRepository {
 
     }
 
-    fn check_payment_status(&self, label: &str) -> Result<PaymentDetails, String> {
-        match self.payment_database_datasource.check_payment_window_status(label) {
+    fn check_payment_status(&self, payment_search_model: PaymentWindowSearch) -> Result<PaymentDetails, String> {
+        match self.payment_database_datasource.check_payment_window_status(PaymentWindowSearchEntity::map_to_entity(payment_search_model)) {
             Ok(payment_details_entity) => Ok(payment_details_entity.map_to_business()),
             Err(e) => Err(e)
         }
     }
 
-    fn refund(&self, label: &str) -> Result<Vec<Transaction>, String> {
-        match self.payment_database_datasource.get_payment_window_by_label(label) {
+    fn refund(&self, payment_search_model: PaymentWindowSearch) -> Result<Vec<Transaction>, String> {
+        let cloned_payment_search_model = payment_search_model.clone();
+        match self.payment_database_datasource.get_payment_window_by_label(PaymentWindowSearchEntity::map_to_entity(payment_search_model)) {
             Ok(_) => {
-                match self.payment_network_datasource.send_refund(label) {
+                match self.payment_network_datasource.send_refund(cloned_payment_search_model.get_label()) {
                     Ok(transaction_entities) => {
-                        match self.payment_database_datasource.suspend_payment_window(label) {
+                        match self.payment_database_datasource.suspend_payment_window(PaymentWindowSearchEntity::map_to_entity(cloned_payment_search_model)) {
                             Ok(_) => {
                                 let mut transactions: Vec<Transaction> = Vec::new();
                                 for transaction_entity in transaction_entities {
@@ -65,8 +66,8 @@ impl IPaymentRepository for PaymentRepository {
         }
     }
 
-    fn suspend_payment_window(&self, label: &str) -> Result<(), String> {
-        self.payment_database_datasource.suspend_payment_window(label)
+    fn suspend_payment_window(&self, payment_search_model: PaymentWindowSearch) -> Result<(), String> {
+        self.payment_database_datasource.suspend_payment_window(PaymentWindowSearchEntity::map_to_entity(payment_search_model))
     }
 }
 

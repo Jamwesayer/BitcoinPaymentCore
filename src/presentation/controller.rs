@@ -25,7 +25,7 @@ impl PaymentController {
         }
     }
 
-    pub fn refund(&self, label: &str) {
-        self.payment_controller_service.refund(label);
+    pub fn refund(&self, payment_search_item: PaymentWindowSearchItem) {
+        self.payment_controller_service.refund(payment_search_item);
     }
 }

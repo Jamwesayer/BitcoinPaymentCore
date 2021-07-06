@@ -49,7 +49,7 @@ impl ITransactionRepository for TransactionRepository {
                             if transactions.len() > 0 {
                                 println!("{:?}", amount);
                                 total_amount += amount;
-                                database_instance.save_transaction(&label, transactions);
+                                database_instance.save_transaction(&label, &store_id, transactions);
                                 println!("Amount: {}, for label: {}", amount, label);
                             }
                         }
@@ -72,12 +72,12 @@ impl ITransactionRepository for TransactionRepository {
 
     }
 
-    fn save_transaction_to_database(&self, label: &str, transactions: Vec<Transaction>) -> Result<(), String> {
+    fn save_transaction_to_database(&self, label: &str, store_id: &i32, transactions: Vec<Transaction>) -> Result<(), String> {
         let mut transaction_entities: Vec<TransactionEntity> = Vec::new();
         for transaction in transactions {
             transaction_entities.push(TransactionEntity::map_to_entity(transaction));
         }
-        self.transaction_database_datasource.save_transaction(label, transaction_entities)
+        self.transaction_database_datasource.save_transaction(label, store_id, transaction_entities)
     }
 }
 

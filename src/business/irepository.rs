@@ -17,7 +17,7 @@ pub trait IPaymentRepository {
     /// # Arguments
     ///
     /// * `label` - A &str which will be used to identify the payment window
-    fn check_payment_status(&self, label: &str) -> Result<PaymentDetails, String>;
+    fn check_payment_status(&self, payment_search_model: PaymentWindowSearch) -> Result<PaymentDetails, String>;
 
     /// Returns Result<String, String>
     ///
@@ -26,9 +26,9 @@ pub trait IPaymentRepository {
     /// # Arguments
     ///
     /// * `label` - A &str which will be used to identify the specific label for which the payments has been done
-    fn refund(&self, label: &str) -> Result<Vec<Transaction>, String>;
+    fn refund(&self, payment_search_model: PaymentWindowSearch) -> Result<Vec<Transaction>, String>;
 
-    fn suspend_payment_window(&self, label: &str) -> Result<(), String>;
+    fn suspend_payment_window(&self, payment_search_model: PaymentWindowSearch) -> Result<(), String>;
 }
 
 use async_trait::async_trait;
@@ -55,5 +55,5 @@ pub trait ITransactionRepository {
     /// * `label` - A &str to identify the incoming transactions
     fn get_all_transactions(&self, label: &str);
 
-    fn save_transaction_to_database(&self, label: &str, transactions: Vec<Transaction>) -> Result<(), String>;
+    fn save_transaction_to_database(&self, label: &str, store_id: &i32, transactions: Vec<Transaction>) -> Result<(), String>;
 }

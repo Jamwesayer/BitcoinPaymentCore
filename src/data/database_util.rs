@@ -54,10 +54,10 @@ pub fn insert_payment_window(entity: &PaymentRequestEntity) -> Result<GeneratedP
 /// # Arguments
 ///
 /// * `label` - An &str value
-pub fn suspend_payment_window(_label: &str) -> Result<(), Error> {
+pub fn suspend_payment_window(_label: &str, store_id: &i32) -> Result<(), Error> {
     use crate::schema::payment_window::dsl::{payment_window, payment_status_id};
 
-    match get_payment_window_by_label(_label) {
+    match get_payment_window_by_label(_label, store_id) {
         Ok(row) => {
             if row.status_id.eq(&2) || row.status_id.eq(&4) {
                 Err(NotFound)
@@ -79,11 +79,12 @@ pub fn suspend_payment_window(_label: &str) -> Result<(), Error> {
 /// # Arguments
 ///
 /// * `label` - An &str value
-pub fn get_payment_window_by_label(_label: &str) -> Result<PaymentWindow, Error> {
-    use crate::schema::payment_window::dsl::{payment_window, label};
+pub fn get_payment_window_by_label(_label: &str, store_id: &i32) -> Result<PaymentWindow, Error> {
+    use crate::schema::payment_window::dsl::{payment_window, label, store_id};
 
     payment_window
         .filter(label.eq(_label))
+        .filter(store_id.eq(store_id))
         .limit(1)
         .get_result::<PaymentWindow>(&establish_connection())
 }
@@ -94,12 +95,12 @@ pub fn get_payment_window_by_label(_label: &str) -> Result<PaymentWindow, Error>
 ///
 /// * `_label` - An &str value to find the payment window that will be used to associate the id
 /// * `_transactions` - A list of transactions entities which will be added tot he database
-pub fn insert_transactions(_label: &str, _transactions: Vec::<TransactionEntity>) -> Result<(), Error> {
+pub fn insert_transactions(_label: &str, store_id: &i32,  _transactions: Vec::<TransactionEntity>) -> Result<(), Error> {
     use crate::schema::transaction::dsl::{transaction};
 
     let mut transaction_db_models: Vec::<NewTransaction> = Vec::new();
 
-    match get_payment_window_by_label(_label) {
+    match get_payment_window_by_label(_label, store_id) {
         Ok(payment_window) => {
             let payment_window_id = &payment_window.id;
             for _transaction in &_transactions {

@@ -25,12 +25,12 @@ impl PaymentControllerService {
         self.transaction_usecase.follow_transaction(generated_payment_request_item.get_label().to_string(), *generated_payment_request_item.get_amount(), store_id).await;
     }
 
-    pub fn check_payment_status(&self, label: &str) -> Result<PaymentDetailsItem, String> {
-        self.payment_usecase.check_payment_status(label)
+    pub fn check_payment_status(&self, payment_search_item: PaymentWindowSearchItem) -> Result<PaymentDetailsItem, String> {
+        self.payment_usecase.check_payment_status(payment_search_item)
     }
 
-    pub fn refund(&self, label: &str)  -> Result<Vec<TransactionItem>, String> {
-        self.payment_usecase.get_refund(label)
+    pub fn refund(&self, payment_search_item: PaymentWindowSearchItem)  -> Result<Vec<TransactionItem>, String> {
+        self.payment_usecase.get_refund(payment_search_item)
     }
 }
 
