@@ -13,10 +13,8 @@ impl TransactionUseCase {
     }
 
     pub fn get_transaction_by_transaction_id(&self, transaction_id: &str) -> Result<TransactionItem, String> {
-        match self.transaction_repository.find_transaction_by_id(transaction_id) {
-            Ok(transaction_model) => Ok(TransactionItem::map_to_presentation(transaction_model)),
-            Err(e) => Err(e)
-        }
+        let transaction_model = self.transaction_repository.find_transaction_by_id(transaction_id)?;
+        Ok(TransactionItem::map_to_presentation(transaction_model))
     }
 
     pub fn new(transaction_repository: Box<dyn ITransactionRepository>) -> Self {

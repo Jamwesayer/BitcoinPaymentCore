@@ -1,5 +1,5 @@
 use crate::data::idatasource::{IPaymentNetworkDataSource, IPaymentDatabaseDataSource, PaymentNetwork, PaymentDatabase};
-use crate::data::entity::payment::{PaymentRequestEntity};
+use crate::data::entity::payment::*;
 use crate::business::irepository::{IPaymentRepository};
 use crate::business::model::*;
 
@@ -19,54 +19,32 @@ impl PaymentRepository {
 
 impl IPaymentRepository for PaymentRepository {
     fn create_payment_window(&self, payment_request: PaymentRequest) -> Result<GeneratedPaymentRequest, String> {
-        match self.payment_network_datasource.create_payment_window(&payment_request.get_label()) {
-            Ok(address) => {
-                match self.payment_database_datasource.insert_payment_window(&PaymentRequestEntity::map_to_entity(payment_request)) {
-                    Ok(generated_payment_request_entity) => {
-                        Ok(generated_payment_request_entity.map_to_business(address))
-                    },
-                    Err(e) => Err(e)
-                }
-            },
-            Err(e) => Err(e)
-        }
+        let address = self.payment_network_datasource.create_payment_window(&payment_request.get_label())?;
+        let generated_payment_request_entity = self.payment_database_datasource.insert_payment_window(&PaymentRequestEntity::map_to_entity(payment_request))?;
 
-
+        Ok(generated_payment_request_entity.map_to_business(address))
     }
 
-    fn check_payment_status(&self, label: &str) -> Result<PaymentDetails, String> {
-        match self.payment_database_datasource.check_payment_window_status(label) {
-            Ok(payment_details_entity) => Ok(payment_details_entity.map_to_business()),
-            Err(e) => Err(e)
-        }
+    fn check_payment_status(&self, payment_search_model: PaymentWindowSearch) -> Result<PaymentDetails, String> {
+        let payment_details_entity = self.payment_database_datasource.check_payment_window_status(PaymentWindowSearchEntity::map_to_entity(payment_search_model))?;
+        Ok(payment_details_entity.map_to_business())
     }
 
-    fn refund(&self, label: &str) -> Result<Vec<Transaction>, String> {
-        match self.payment_database_datasource.get_payment_window_by_label(label) {
-            Ok(_) => {
-                match self.payment_network_datasource.send_refund(label) {
-                    Ok(transaction_entities) => {
-                        match self.payment_database_datasource.suspend_payment_window(label) {
-                            Ok(_) => {
-                                let mut transactions: Vec<Transaction> = Vec::new();
-                                for transaction_entity in transaction_entities {
-                                    transactions.push(transaction_entity.map_to_business())
-                                };
-                                Ok(transactions)
-                            },
-                            Err(e) => Err(e)
-                        }
+    fn refund(&self, payment_search_model: PaymentWindowSearch) -> Result<Vec<Transaction>, String> {
+        let cloned_payment_search_model = payment_search_model.clone();
+        self.payment_database_datasource.get_payment_window_by_label(PaymentWindowSearchEntity::map_to_entity(payment_search_model))?;
+        let transaction_entities = self.payment_network_datasource.send_refund(cloned_payment_search_model.get_label())?;
+        self.payment_database_datasource.suspend_payment_window(PaymentWindowSearchEntity::map_to_entity(cloned_payment_search_model))?;
 
-                    },
-                    Err(e) => Err(e)
-                }
-            },
-            Err(e) => Err(e)
-        }
+        let mut transactions: Vec<Transaction> = Vec::new();
+        for transaction_entity in transaction_entities {
+            transactions.push(transaction_entity.map_to_business())
+        };
+        Ok(transactions)
     }
 
-    fn suspend_payment_window(&self, label: &str) -> Result<(), String> {
-        self.payment_database_datasource.suspend_payment_window(label)
+    fn suspend_payment_window(&self, payment_search_model: PaymentWindowSearch) -> Result<(), String> {
+        self.payment_database_datasource.suspend_payment_window(PaymentWindowSearchEntity::map_to_entity(payment_search_model))
     }
 }
 

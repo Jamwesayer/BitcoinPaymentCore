@@ -39,17 +39,16 @@ impl ITransactionRepository for TransactionRepository {
             loop {
                 match network_instance.follow_transactions_for_label(&label, skip) {
                     Ok((amount, transactions)) => {
-                        // save transactions to database with db ds
-                        // save_transaction_to_database()
                         skip += transactions.len() as i32;
                         if total_amount >= expected_amount {
                             println!("Amount is correct {}", label);
+                            // set payment_window to payed
                             break;
                         } else {
                             if transactions.len() > 0 {
                                 println!("{:?}", amount);
                                 total_amount += amount;
-                                database_instance.save_transaction(&label, transactions);
+                                database_instance.save_transaction(&label, &store_id, transactions);
                                 println!("Amount: {}, for label: {}", amount, label);
                             }
                         }
@@ -62,22 +61,20 @@ impl ITransactionRepository for TransactionRepository {
     }
 
     fn find_transaction_by_id(&self, transaction_id: &str) -> Result<Transaction, String> {
-        match self.transaction_database_datasource.get_transaction_by_transaction_id(transaction_id) {
-            Ok(transaction_entity) => Ok(transaction_entity.map_to_business()),
-            Err(e) => Err(e.to_string())
-        }
+        let transaction_entity = self.transaction_database_datasource.get_transaction_by_transaction_id(transaction_id)?;
+        Ok(transaction_entity.map_to_business())
     }
 
     fn get_all_transactions(&self, label: &str) {
 
     }
 
-    fn save_transaction_to_database(&self, label: &str, transactions: Vec<Transaction>) -> Result<(), String> {
+    fn save_transaction_to_database(&self, label: &str, store_id: &i32, transactions: Vec<Transaction>) -> Result<(), String> {
         let mut transaction_entities: Vec<TransactionEntity> = Vec::new();
         for transaction in transactions {
             transaction_entities.push(TransactionEntity::map_to_entity(transaction));
         }
-        self.transaction_database_datasource.save_transaction(label, transaction_entities)
+        self.transaction_database_datasource.save_transaction(label, store_id, transaction_entities)
     }
 }
 

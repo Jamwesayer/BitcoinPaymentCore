@@ -1,6 +1,4 @@
-use payment_core::presentation::item::GeneratedPaymentRequestItem;
-use payment_core::presentation::item::PaymentRequestItem;
-use payment_core::presentation::item::PaymentDetailsItem;
+use payment_core::presentation::item::*;
 use payment_core::business::usecase::payment::PaymentUseCase;
 
 mod common;
@@ -12,9 +10,10 @@ fn test_check_payment_status_success() {
     let usecase = PaymentUseCase::new(Box::new(repo0), Box::new(repo1));
 
     let label = "ThisShouldWork";
+    let search_item = PaymentWindowSearchItem::new(label.to_string(), 1);
     let expected_item = PaymentDetailsItem::new(label.to_string(), 99.99, "ThisShouldWorkNew".to_string(), 1);
 
-    assert_eq!(usecase.check_payment_status(label).unwrap(), expected_item);
+    assert_eq!(usecase.check_payment_status(search_item).unwrap(), expected_item);
 }
 
 #[test]
@@ -25,8 +24,9 @@ fn test_check_payment_status_error() {
     let usecase = PaymentUseCase::new(Box::new(repo0), Box::new(repo1));
 
     let label = "ThisShouldNotWork";
+    let search_item = PaymentWindowSearchItem::new(label.to_string(), 1);
 
-    usecase.check_payment_status(label).unwrap();
+    usecase.check_payment_status(search_item).unwrap();
 }
 
 #[test]
@@ -60,8 +60,9 @@ fn test_suspend_payment_window_success() {
     let usecase = PaymentUseCase::new(Box::new(repo0), Box::new(repo1));
 
     let label = "ThisShouldWork";
+    let search_item = PaymentWindowSearchItem::new(label.to_string(), 1);
 
-    assert_eq!(usecase.suspend_payment_window(label).unwrap(), ());
+    assert_eq!(usecase.suspend_payment_window(search_item).unwrap(), ());
 }
 
 #[test]
@@ -72,6 +73,7 @@ fn test_suspend_payment_window_fail() {
     let usecase = PaymentUseCase::new(Box::new(repo0), Box::new(repo1));
 
     let label = "ThisShouldNotWork";
+    let search_item = PaymentWindowSearchItem::new(label.to_string(), 1);
 
-    usecase.suspend_payment_window(label).unwrap();
+    usecase.suspend_payment_window(search_item).unwrap();
 }

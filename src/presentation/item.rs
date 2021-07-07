@@ -32,6 +32,30 @@ impl<'a> PaymentRequestItem {
 
 }
 
+#[derive(Debug, PartialEq, Clone)]
+pub struct PaymentWindowSearchItem {
+    label: String,
+    store_id: i32
+}
+
+impl PaymentWindowSearchItem {
+    pub fn new(label: String, store_id: i32) -> Self {
+        PaymentWindowSearchItem {
+            label: label,
+            store_id: store_id
+        }
+    }
+    pub fn get_label(&self) -> &str {
+        self.label.as_str()
+    }
+    pub fn get_store_id(&self) -> &i32 {
+        &self.store_id
+    }
+    pub fn map_to_business(self) -> PaymentWindowSearch {
+        PaymentWindowSearch::new(self.label, self.store_id)
+    }
+}
+
 #[derive(Debug, PartialEq)]
 pub struct GeneratedPaymentRequestItem {
     label: String,

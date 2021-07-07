@@ -1,15 +1,15 @@
 use dyn_clone::DynClone;
 use crate::data::blockchain_util as blockchain;
 use crate::data::database_util as database;
-use crate::data::entity::payment::{PaymentRequestEntity, GeneratedPaymentRequestEntity, PaymentDetailsEntity};
-use crate::data::entity::transaction::{TransactionEntity};
+use crate::data::entity::payment::*;
+use crate::data::entity::transaction::*;
 
 //------------------------------------------------------------------------------------------------- Payment
 pub trait IPaymentDatabaseDataSource {
     fn insert_payment_window(&self, payment_window_entity: &PaymentRequestEntity) -> Result<GeneratedPaymentRequestEntity, String>;
-    fn check_payment_window_status(&self, label: &str) -> Result<PaymentDetailsEntity, String>;
-    fn get_payment_window_by_label(&self, label: &str) -> Result<(), String>;
-    fn suspend_payment_window(&self, label: &str) -> Result<(), String>;
+    fn check_payment_window_status(&self, payment_search_entity: PaymentWindowSearchEntity) -> Result<PaymentDetailsEntity, String>;
+    fn get_payment_window_by_label(&self, payment_search_entity: PaymentWindowSearchEntity) -> Result<(), String>;
+    fn suspend_payment_window(&self, payment_search_entity: PaymentWindowSearchEntity) -> Result<(), String>;
 }
 
 pub struct PaymentDatabase {}
@@ -28,8 +28,8 @@ impl<'a> IPaymentDatabaseDataSource for PaymentDatabase {
         }
     }
 
-    fn check_payment_window_status(&self, label: &str) -> Result<PaymentDetailsEntity, String>{
-        if let Ok(payment_window) = database::get_payment_window_by_label(label) {
+    fn check_payment_window_status(&self, payment_search_entity: PaymentWindowSearchEntity) -> Result<PaymentDetailsEntity, String>{
+        if let Ok(payment_window) = database::get_payment_window_by_label(payment_search_entity.get_label(), payment_search_entity.get_store_id()) {
             match database::get_store_wallet_by_id(&payment_window.store_id) {
                 Ok(store) => {
                     Ok(PaymentDetailsEntity::new(payment_window.label, payment_window.amount, store.wallet_address, payment_window.status_id))
@@ -41,14 +41,14 @@ impl<'a> IPaymentDatabaseDataSource for PaymentDatabase {
             Err("Error".to_string())
         }
     }
-    fn get_payment_window_by_label(&self, label: &str) -> Result<(), String> {
-        match database::get_payment_window_by_label(label) {
+    fn get_payment_window_by_label(&self, payment_search_entity: PaymentWindowSearchEntity) -> Result<(), String> {
+        match database::get_payment_window_by_label(payment_search_entity.get_label(), payment_search_entity.get_store_id()) {
             Ok(_) => Ok(()),
             Err(e) => Err(e.to_string())
         }
     }
-    fn suspend_payment_window(&self, label: &str) -> Result<(), String> {
-        match database::suspend_payment_window(label) {
+    fn suspend_payment_window(&self, payment_search_entity: PaymentWindowSearchEntity) -> Result<(), String> {
+        match database::suspend_payment_window(payment_search_entity.get_label(), payment_search_entity.get_store_id()) {
             Ok(_) => Ok(()),
             Err(e) => Err(e.to_string())
         }
@@ -84,7 +84,7 @@ impl IPaymentNetworkDataSource for PaymentNetwork {
 
 //------------------------------------------------------------------------------------------------- Transaction
 pub trait ITransactionDatabaseDataSource: DynClone {
-    fn save_transaction(&self, label: &str, transaction_entities: Vec::<TransactionEntity>) -> Result<(), String>;
+    fn save_transaction(&self, label: &str, store_id: &i32, transaction_entities: Vec::<TransactionEntity>) -> Result<(), String>;
     fn get_transaction_by_transaction_id(&self, transaction_id: &str) -> Result<TransactionEntity, String>;
     fn get_total_transactions_by_store_id(&self, store_id: &i32) -> Result<i64, String>;
     fn get_all_transactions(&self, label: &str) -> Result<Vec<TransactionEntity>, String>;
@@ -100,8 +100,8 @@ impl Default for TransactionDatabase {
 }
 
 impl ITransactionDatabaseDataSource for TransactionDatabase {
-    fn save_transaction(&self, label: &str, transaction_entities: Vec<TransactionEntity>) -> Result<(), String> {
-        match database::insert_transactions(label, transaction_entities) {
+    fn save_transaction(&self, label: &str, store_id: &i32, transaction_entities: Vec<TransactionEntity>) -> Result<(), String> {
+        match database::insert_transactions(label, store_id, transaction_entities) {
             Ok(_) => Ok(()),
             Err(e) => Err(e.to_string())
         }

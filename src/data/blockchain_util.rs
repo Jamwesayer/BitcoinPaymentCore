@@ -63,7 +63,7 @@ pub fn refund(label: &str) -> Result<Vec::<TransactionEntity>, String> {
                         transaction.info.txid.to_string(),
                         transaction.detail.address.as_ref().unwrap().to_string(),
                         2,
-                        chrono::NaiveDateTime::from_timestamp(0, transaction.info.timereceived.try_into().unwrap())
+                        chrono::NaiveDateTime::from_timestamp(transaction.info.timereceived.try_into().unwrap(), 0)
                     )
                 );
                 println!("{:?}", transaction.detail.address);
