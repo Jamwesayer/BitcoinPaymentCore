@@ -39,11 +39,10 @@ impl ITransactionRepository for TransactionRepository {
             loop {
                 match network_instance.follow_transactions_for_label(&label, skip) {
                     Ok((amount, transactions)) => {
-                        // save transactions to database with db ds
-                        // save_transaction_to_database()
                         skip += transactions.len() as i32;
                         if total_amount >= expected_amount {
                             println!("Amount is correct {}", label);
+                            // set payment_window to payed
                             break;
                         } else {
                             if transactions.len() > 0 {
@@ -62,10 +61,8 @@ impl ITransactionRepository for TransactionRepository {
     }
 
     fn find_transaction_by_id(&self, transaction_id: &str) -> Result<Transaction, String> {
-        match self.transaction_database_datasource.get_transaction_by_transaction_id(transaction_id) {
-            Ok(transaction_entity) => Ok(transaction_entity.map_to_business()),
-            Err(e) => Err(e.to_string())
-        }
+        let transaction_entity = self.transaction_database_datasource.get_transaction_by_transaction_id(transaction_id)?;
+        Ok(transaction_entity.map_to_business())
     }
 
     fn get_all_transactions(&self, label: &str) {

@@ -25,6 +25,13 @@ impl PaymentController {
         }
     }
 
+    pub fn check_payment_status(&self, payment_search_item: PaymentWindowSearchItem) {
+        match self.payment_controller_service.check_payment_status(payment_search_item) {
+            Ok(payment_details_item) => println!("{:?}", payment_details_item),
+            Err(e) => println!("Error")
+        }
+    }
+
     pub fn refund(&self, payment_search_item: PaymentWindowSearchItem) {
         self.payment_controller_service.refund(payment_search_item);
     }

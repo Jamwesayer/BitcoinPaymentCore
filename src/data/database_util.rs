@@ -74,11 +74,12 @@ pub fn suspend_payment_window(_label: &str, store_id: &i32) -> Result<(), Error>
     }
 }
 
-/// Get the payment window by label
+/// Get the payment window by label for a specific store
 ///
 /// # Arguments
 ///
 /// * `label` - An &str value
+/// * `label` - An &i32 value representing the specific store
 pub fn get_payment_window_by_label(_label: &str, store_id: &i32) -> Result<PaymentWindow, Error> {
     use crate::schema::payment_window::dsl::{payment_window, label, store_id};
 
