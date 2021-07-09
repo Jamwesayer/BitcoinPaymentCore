@@ -36,6 +36,11 @@ pub fn insert_payment_window(entity: &PaymentRequestEntity) -> Result<GeneratedP
     use crate::schema::payment_window::dsl::{payment_window, id};
     let new_payment_window = NewPaymentRequest {label: entity.get_label(), amount: entity.get_amount(), store_id: entity.get_store_id()};
 
+    match get_payment_window_by_label(entity.get_label(), entity.get_store_id()) {
+        Ok(payment_window_db) => return Err(AlreadyInTransaction),
+        Err(e) => {}
+    }
+
     diesel::insert_into(payment_window)
         .values(&new_payment_window)
         .execute(&establish_connection())
@@ -49,6 +54,23 @@ pub fn insert_payment_window(entity: &PaymentRequestEntity) -> Result<GeneratedP
     }
 }
 
+pub fn set_payment_window_to_payed(_label: &str, store_id: &i32) -> Result<(), Error> {
+    use crate::schema::payment_window::dsl::{payment_window, payment_status_id};
+
+    let row = get_payment_window_by_label(_label, store_id)?;
+
+    if row.status_id.eq(&1) || row.status_id.eq(&2) || row.status_id.eq(&4) {
+        Err(NotFound)
+    } else {
+         diesel::update(payment_window.find(row.id))
+        .set(payment_status_id.eq(1))
+        .execute(&establish_connection());
+
+        Ok(())
+    }
+
+}
+
 /// Supsends a open payment window with the given label
 ///
 /// # Arguments
@@ -56,21 +78,16 @@ pub fn insert_payment_window(entity: &PaymentRequestEntity) -> Result<GeneratedP
 /// * `label` - An &str value
 pub fn suspend_payment_window(_label: &str, store_id: &i32) -> Result<(), Error> {
     use crate::schema::payment_window::dsl::{payment_window, payment_status_id};
+    let row = get_payment_window_by_label(_label, store_id)?;
 
-    match get_payment_window_by_label(_label, store_id) {
-        Ok(row) => {
-            if row.status_id.eq(&2) || row.status_id.eq(&4) {
-                Err(NotFound)
-            } else {
-                 match diesel::update(payment_window.find(row.id))
-                .set(payment_status_id.eq(4))
-                .execute(&establish_connection()) {
-                    Ok(_) => Ok(()),
-                    Err(e) => Err(e)
-                }
-            }
-        },
-        Err(e) => Err(e)
+    if row.status_id.eq(&1) || row.status_id.eq(&2) || row.status_id.eq(&4) {
+        Err(NotFound)
+    } else {
+         diesel::update(payment_window.find(row.id))
+        .set(payment_status_id.eq(4))
+        .execute(&establish_connection());
+
+        Ok(())
     }
 }
 
@@ -124,6 +141,14 @@ pub fn insert_transactions(_label: &str, store_id: &i32,  _transactions: Vec::<T
         },
         Err(e) => Err(e)
     }
+}
+
+pub fn get_all_transactions(_store_id: &i32) -> Result<Vec<Transaction>, Error> {
+    use crate::schema::transaction::dsl::{transaction, hash, id, amount, from_address, date, transaction_type_id, transaction_status_id, payment_window_id};
+    use crate::schema::payment_window::dsl::{payment_window, store_id};
+
+    let transactions: Vec<Transaction> = transaction.inner_join(payment_window).select((id, amount, hash, from_address, date, transaction_type_id, transaction_status_id, payment_window_id)).filter(store_id.eq(_store_id)).load(&establish_connection()).expect("Couldn't get all transactions for store");
+    Ok(transactions)
 }
 
 pub fn get_transaction_by_transaction_id(_transaction_id: &str) -> Result<Transaction, Error> {
