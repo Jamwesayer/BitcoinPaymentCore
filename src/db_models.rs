@@ -39,7 +39,7 @@ pub struct NewTransaction<'a> {
     pub payment_window_id: &'a i32
 }
 
-#[derive(Identifiable, Queryable, Associations)]
+#[derive(Identifiable, Queryable, Associations, Debug)]
 #[belongs_to(PaymentWindow. foreign_key="payment_window_id")]
 #[table_name = "transaction"]
 pub struct Transaction {
