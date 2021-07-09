@@ -66,8 +66,6 @@ pub fn refund(label: &str) -> Result<Vec::<TransactionEntity>, String> {
                         chrono::NaiveDateTime::from_timestamp(transaction.info.timereceived.try_into().unwrap(), 0)
                     )
                 );
-                println!("{:?}", transaction.detail.address);
-                println!("{:?}", transaction.detail.amount);
                 send_transaction_to_address(&transaction.detail.address.unwrap(), Amount::from_sat(transaction.detail.amount.as_sat() as u64));
             }
             Ok(transaction_entities)
