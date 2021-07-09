@@ -34,7 +34,6 @@ impl IPaymentRepository for PaymentRepository {
         let cloned_payment_search_model = payment_search_model.clone();
         self.payment_database_datasource.get_payment_window_by_label(PaymentWindowSearchEntity::map_to_entity(payment_search_model))?;
         let transaction_entities = self.payment_network_datasource.send_refund(cloned_payment_search_model.get_label())?;
-        self.payment_database_datasource.suspend_payment_window(PaymentWindowSearchEntity::map_to_entity(cloned_payment_search_model))?;
 
         let mut transactions: Vec<Transaction> = Vec::new();
         for transaction_entity in transaction_entities {

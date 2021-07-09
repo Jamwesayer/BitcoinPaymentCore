@@ -10,6 +10,7 @@ use clap::{Arg, App, SubCommand};
 async fn main() {
 
     let payment_controller = PaymentController::default();
+    let transaction_controller = TransactionController::default();
 
     let matches = App::new("BTC Payment System")
         .version("0.1")
@@ -45,6 +46,12 @@ async fn main() {
                 .required(true)
                 .index(1))
         )
+        .subcommand(
+            SubCommand::with_name("get-transactions")
+            .about("Retrieve all transactions")
+            .version("0.1")
+            .author("James Bal")
+        )
         .get_matches();
 
     if let Some(matches) = matches.subcommand_matches("create-order") {
@@ -70,7 +77,11 @@ async fn main() {
         let store_id = get_current_store_id();
 
         let search_item = PaymentWindowSearchItem::new(label, store_id);
-        payment_controller.refund(search_item);
+        payment_controller.suspend_payment_window(search_item);
+    }
+
+    if let Some(matches) = matches.subcommand_matches("get-transactions") {
+        transaction_controller.get_all_transactions(&get_current_store_id());
     }
 }
 

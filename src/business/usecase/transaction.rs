@@ -17,6 +17,16 @@ impl TransactionUseCase {
         Ok(TransactionItem::map_to_presentation(transaction_model))
     }
 
+    pub fn get_all_transactions(&self, store_id: &i32) -> Result<Vec<TransactionItem>, String> {
+        let transactions = self.transaction_repository.get_all_transactions(store_id)?;
+
+        let mut transaction_items = Vec::new();
+        for transaction_model in transactions {
+            transaction_items.push(TransactionItem::map_to_presentation(transaction_model));
+        }
+        Ok(transaction_items)
+    }
+
     pub fn new(transaction_repository: Box<dyn ITransactionRepository>) -> Self {
         Self {
             transaction_repository: transaction_repository

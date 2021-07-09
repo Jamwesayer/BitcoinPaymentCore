@@ -135,25 +135,41 @@ pub enum Status {
     Suspended
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct TransactionItem {
     amount: f64,
     transaction_id: String,
     origin_address: String,
-    time_received: NaiveDateTime
+    time_received: NaiveDateTime,
+    transaction_status: TransactionStatus,
+    transaction_type: TransactionType
+
 }
 
 impl TransactionItem {
-    pub fn new(amount: f64, transaction_id: String, origin_address: String, time_received: NaiveDateTime) -> Self {
+    pub fn new(amount: f64, transaction_id: String, origin_address: String, time_received: NaiveDateTime, transaction_status_id: i32, transaction_type_id: i32) -> Self {
+
+        let _transaction_status = match transaction_status_id {
+            1 => TransactionStatus::Success,
+            _ => TransactionStatus::Failed
+        };
+
+        let _transaction_type = match transaction_type_id {
+            1 => TransactionType::Payment,
+            _ => TransactionType::Refund
+        };
+
         Self {
             amount: amount,
             transaction_id: transaction_id,
             origin_address: origin_address,
-            time_received: time_received
+            time_received: time_received,
+            transaction_status: _transaction_status,
+            transaction_type: _transaction_type
         }
     }
     pub fn map_to_presentation(model: Transaction) -> Self {
-        TransactionItem::new(*model.get_amount(), model.get_transaction_id().to_string(), model.get_origin_address().to_string(), *model.get_time_received())
+        TransactionItem::new(*model.get_amount(), model.get_transaction_id().to_string(), model.get_origin_address().to_string(), *model.get_time_received(), *model.get_transaction_status(), *model.get_transaction_type())
     }
 
     pub fn get_amount(&self) -> &f64 {
@@ -169,9 +185,25 @@ impl TransactionItem {
     pub fn get_origin_address(&self) -> &str {
         self.origin_address.as_str()
     }
+    pub fn get_transaction_status(&self) -> &TransactionStatus {
+        &self.transaction_status
+    }
+    pub fn get_transaction_type(&self) -> &TransactionStatus {
+        &self.transaction_status
+    }
 }
 
+#[derive(Debug, PartialEq)]
+pub enum TransactionStatus {
+    Success,
+    Failed
+}
 
+#[derive(Debug, PartialEq)]
+pub enum TransactionType {
+    Payment,
+    Refund
+}
 
 
 // ---------------------------------------- TEST

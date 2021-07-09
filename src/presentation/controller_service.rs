@@ -17,6 +17,7 @@ impl Default for PaymentControllerService {
 }
 
 impl PaymentControllerService {
+
     pub fn create_payment_window(&self, payment_request_item: PaymentRequestItem) -> Result<GeneratedPaymentRequestItem, String> {
         self.payment_usecase.create_payment_window(payment_request_item)
     }
@@ -31,6 +32,10 @@ impl PaymentControllerService {
 
     pub fn refund(&self, payment_search_item: PaymentWindowSearchItem)  -> Result<Vec<TransactionItem>, String> {
         self.payment_usecase.get_refund(payment_search_item)
+    }
+
+    pub fn suspend_payment_window(&self, payment_search_item: PaymentWindowSearchItem) -> Result<(String, Vec<TransactionItem>), String> {
+        self.payment_usecase.suspend_payment_window(payment_search_item)
     }
 }
 
@@ -50,5 +55,8 @@ impl Default for TransactionControllerService {
 impl TransactionControllerService {
     pub fn get_transaction_by_transaction_id(&self, transaction_id: &str) -> Result<TransactionItem, String> {
         self.transaction_usecase.get_transaction_by_transaction_id(transaction_id)
+    }
+    pub fn get_all_transactions(&self, store_id: &i32) -> Result<Vec<TransactionItem>, String> {
+        self.transaction_usecase.get_all_transactions(store_id)
     }
 }

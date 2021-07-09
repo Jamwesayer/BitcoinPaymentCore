@@ -25,7 +25,7 @@ impl PaymentUseCase {
 
         let transactions_cloned = transactions.clone();
         self.transaction_repository.save_transaction_to_database(cloned_payment_search_item.get_label(), cloned_payment_search_item.get_store_id(), transactions)?;
-        
+
         let mut transaction_items: Vec<TransactionItem> = Vec::new();
         for transaction in transactions_cloned {
             transaction_items.push(TransactionItem::map_to_presentation(transaction));
@@ -33,8 +33,15 @@ impl PaymentUseCase {
         Ok(transaction_items)
     }
 
-    pub fn suspend_payment_window(&self, payment_search_item: PaymentWindowSearchItem) -> Result<(), String> {
-        self.payment_repository.suspend_payment_window(payment_search_item.map_to_business())
+    pub fn suspend_payment_window(&self, payment_search_item: PaymentWindowSearchItem) -> Result<(String, Vec<TransactionItem>), String> {
+        let payment_search_item_cloned = payment_search_item.clone();
+        match self.payment_repository.suspend_payment_window(payment_search_item.map_to_business()) {
+            Ok(_) => {
+                let transactions = self.get_refund(payment_search_item_cloned)?;
+                Ok(("De betaling is geanulleerd".to_string(), transactions))
+            },
+            Err(e) => Err(e)
+        }
     }
 
     pub fn new(payment_repository: Box<dyn IPaymentRepository>, transaction_repository: Box<dyn ITransactionRepository>) -> Self {

@@ -115,17 +115,19 @@ pub struct Transaction {
     transaction_id: String,
     origin_address: String,
     transaction_type: i32,
-    time_received: NaiveDateTime
+    time_received: NaiveDateTime,
+    transaction_status_id: i32
 }
 
 impl Transaction {
-    pub fn new(amount: f64, transaction_id: String, origin_address: String, transaction_type: i32, time_received: NaiveDateTime) -> Self {
+    pub fn new(amount: f64, transaction_id: String, origin_address: String, transaction_type: i32, time_received: NaiveDateTime, transaction_status_id: i32) -> Self {
         Self {
             amount: amount,
             transaction_id: transaction_id,
             origin_address: origin_address,
             transaction_type: transaction_type,
-            time_received: time_received
+            time_received: time_received,
+            transaction_status_id: transaction_status_id
         }
     }
     pub fn get_amount(&self) -> &f64 {
@@ -143,5 +145,8 @@ impl Transaction {
     }
     pub fn get_origin_address(&self) -> &str {
         self.origin_address.as_str()
+    }
+    pub fn get_transaction_status(&self) -> &i32 {
+        &self.transaction_status_id
     }
 }

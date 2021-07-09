@@ -63,7 +63,8 @@ pub fn refund(label: &str) -> Result<Vec::<TransactionEntity>, String> {
                         transaction.info.txid.to_string(),
                         transaction.detail.address.as_ref().unwrap().to_string(),
                         2,
-                        chrono::NaiveDateTime::from_timestamp(transaction.info.timereceived.try_into().unwrap(), 0)
+                        chrono::NaiveDateTime::from_timestamp(transaction.info.timereceived.try_into().unwrap(), 0),
+                        1
                     )
                 );
                 send_transaction_to_address(&transaction.detail.address.unwrap(), Amount::from_sat(transaction.detail.amount.as_sat() as u64));
@@ -115,7 +116,8 @@ pub fn get_all_transactions_for_address_by_label_with_total(label: &str, skip: i
                             transaction.info.txid.to_string(),
                             transaction.detail.address.as_ref().unwrap().to_string(),
                             1,
-                            chrono::NaiveDateTime::from_timestamp(transaction.info.timereceived.try_into().unwrap(), 0)
+                            chrono::NaiveDateTime::from_timestamp(transaction.info.timereceived.try_into().unwrap(), 0),
+                            1
                         )
                     );
                 amount += transaction.detail.amount.as_btc();

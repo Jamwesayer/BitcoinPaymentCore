@@ -42,7 +42,7 @@ impl ITransactionRepository for TransactionRepository {
                         skip += transactions.len() as i32;
                         if total_amount >= expected_amount {
                             println!("Amount is correct {}", label);
-                            // set payment_window to payed
+                            database_instance.set_payment_window_to_payed(&label, &store_id);
                             break;
                         } else {
                             if transactions.len() > 0 {
@@ -65,8 +65,13 @@ impl ITransactionRepository for TransactionRepository {
         Ok(transaction_entity.map_to_business())
     }
 
-    fn get_all_transactions(&self, label: &str) {
-
+    fn get_all_transactions(&self, store_id: &i32) -> Result<Vec<Transaction>, String> {
+        let transaction_entities = self.transaction_database_datasource.get_all_transactions(store_id)?;
+        let mut transactions = Vec::new();
+        for transaction_entity in transaction_entities {
+            transactions.push(transaction_entity.map_to_business());
+        }
+        Ok(transactions)
     }
 
     fn save_transaction_to_database(&self, label: &str, store_id: &i32, transactions: Vec<Transaction>) -> Result<(), String> {

@@ -12,11 +12,13 @@ pub trait IPaymentDatabaseDataSource {
     fn suspend_payment_window(&self, payment_search_entity: PaymentWindowSearchEntity) -> Result<(), String>;
 }
 
-pub struct PaymentDatabase {}
+pub struct PaymentDatabase {
+}
 
 impl Default for PaymentDatabase {
     fn default() -> Self {
-        Self{}
+        Self{
+        }
     }
 }
 
@@ -60,11 +62,13 @@ pub trait IPaymentNetworkDataSource {
     fn send_refund(&self, label: &str) -> Result<Vec::<TransactionEntity>, String>;
 }
 
-pub struct PaymentNetwork {}
+pub struct PaymentNetwork {
+}
 
 impl Default for PaymentNetwork {
     fn default() -> Self {
-        Self{}
+        Self{
+        }
     }
 }
 
@@ -87,7 +91,8 @@ pub trait ITransactionDatabaseDataSource: DynClone {
     fn save_transaction(&self, label: &str, store_id: &i32, transaction_entities: Vec::<TransactionEntity>) -> Result<(), String>;
     fn get_transaction_by_transaction_id(&self, transaction_id: &str) -> Result<TransactionEntity, String>;
     fn get_total_transactions_by_store_id(&self, store_id: &i32) -> Result<i64, String>;
-    fn get_all_transactions(&self, label: &str) -> Result<Vec<TransactionEntity>, String>;
+    fn get_all_transactions(&self, store_id: &i32) -> Result<Vec<TransactionEntity>, String>;
+    fn set_payment_window_to_payed(&self, label: &str, store_id: &i32) -> Result<(), String>;
 }
 
 #[derive(Clone)]
@@ -108,7 +113,7 @@ impl ITransactionDatabaseDataSource for TransactionDatabase {
     }
     fn get_transaction_by_transaction_id(&self, transaction_id: &str) -> Result<TransactionEntity, String> {
         match database::get_transaction_by_transaction_id(transaction_id) {
-            Ok(transaction) => Ok(TransactionEntity::new(transaction.amount, transaction.hash, transaction.from_address, transaction.transaction_type_id, transaction.date)),
+            Ok(transaction) => Ok(TransactionEntity::new(transaction.amount, transaction.hash, transaction.from_address, transaction.transaction_type_id, transaction.date, transaction.transaction_status_id)),
             Err(e) => Err(e.to_string())
         }
     }
@@ -120,8 +125,24 @@ impl ITransactionDatabaseDataSource for TransactionDatabase {
         }
     }
 
-    fn get_all_transactions(&self, label: &str) -> Result<Vec<TransactionEntity>, String> {
-        Err("test".to_string())
+    fn get_all_transactions(&self, store_id: &i32) -> Result<Vec<TransactionEntity>, String> {
+        match database::get_all_transactions(store_id) {
+            Ok(transactions) => {
+                let mut transaction_entities = Vec::new();
+                for transaction in transactions {
+                    transaction_entities.push(TransactionEntity::new(transaction.amount, transaction.hash, transaction.from_address, transaction.transaction_type_id, transaction.date, transaction.transaction_status_id));
+                }
+                return Ok(transaction_entities)
+            },
+            Err(e) => Err(e.to_string())
+        }
+    }
+
+    fn set_payment_window_to_payed(&self, label: &str, store_id: &i32) -> Result<(), String> {
+        match database::set_payment_window_to_payed(label, store_id) {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e.to_string())
+        }
     }
 }
 
