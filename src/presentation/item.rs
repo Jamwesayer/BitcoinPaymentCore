@@ -210,9 +210,8 @@ pub enum TransactionType {
 
 #[cfg(test)]
 mod tests {
-    use crate::presentation::item::PaymentDetailsItem;
-    use crate::presentation::item::PaymentDetails;
-    use crate::presentation::item::Status;
+    use crate::presentation::item::*;
+    use chrono::naive::*;
 
     #[test]
     fn translating_status_to_enum_status() {
@@ -220,5 +219,23 @@ mod tests {
         let payment_details_item = PaymentDetailsItem::map_to_presentation(payment_details_model);
 
         assert_eq!(payment_details_item.status, Status::Success);
+    }
+
+    #[test]
+    fn translating_transaction_status_to_enum_transaction_status() {
+        let dt: NaiveDateTime = NaiveDate::from_ymd(2016, 7, 8).and_hms(9, 10, 11);
+        let transaction_model = Transaction::new(10.0, "Test".to_string(), "Address".to_string(), 1, dt, 1);
+        let transaction_item = TransactionItem::map_to_presentation(transaction_model);
+
+        assert_eq!(transaction_item.transaction_status, TransactionStatus::Success);
+    }
+
+    #[test]
+    fn translating_transaction_type_to_enum_transaction_type() {
+        let dt: NaiveDateTime = NaiveDate::from_ymd(2016, 7, 8).and_hms(9, 10, 11);
+        let transaction_model = Transaction::new(10.0, "Test".to_string(), "Address".to_string(), 1, dt, 1);
+        let transaction_item = TransactionItem::map_to_presentation(transaction_model);
+
+        assert_eq!(transaction_item.transaction_type, TransactionType::Payment);
     }
 }
