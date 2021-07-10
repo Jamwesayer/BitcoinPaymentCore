@@ -54,7 +54,7 @@ pub struct MockPaymentNetwork {
 impl<'a> IPaymentNetworkDataSource for MockPaymentNetwork {
     fn send_refund(&self, label: &str) -> Result<Vec<TransactionEntity>, String> {
         let dt: NaiveDateTime = NaiveDate::from_ymd(2016, 7, 8).and_hms(9, 10, 11);
-        Ok(vec![TransactionEntity::new(10.0, "hash".to_string(), "origin".to_string(), 1, dt)])
+        Ok(vec![TransactionEntity::new(10.0, "hash".to_string(), "origin".to_string(), 1, dt, 1)])
     }
     fn create_payment_window(&self, label: &str) -> Result<String, String> { Ok(label.to_string() + "New") }
 }
@@ -69,26 +69,36 @@ impl ITransactionDatabaseDataSource for MockTransactionDatabase {
         Ok(())
     }
     fn get_transaction_by_transaction_id(&self, transaction_id: &str) -> Result<TransactionEntity, String>{
-        let dt: NaiveDateTime = NaiveDate::from_ymd(2016, 7, 8).and_hms(9, 10, 11);
-        Ok(TransactionEntity::new(10.0, "hash".to_string(), "origin".to_string(), 1, dt))
+        if transaction_id.eq("ThisShouldWork") {
+            let dt: NaiveDateTime = NaiveDate::from_ymd(2016, 7, 8).and_hms(9, 10, 11);
+            return Ok(TransactionEntity::new(10.0, "hash".to_string(), "origin".to_string(), 1, dt, 1))
+        }
+        Err(format!("De transactie met transactie nummer {} bestaat niet", transaction_id).to_string())
     }
     fn get_total_transactions_by_store_id(&self, store_id: &i32) -> Result<i64, String> {
         Ok(10)
     }
-    fn get_all_transactions(&self, label: &str) -> Result<Vec<TransactionEntity>, String> {
-        Err("Error".to_string())
+    fn get_all_transactions(&self, store_id: &i32) -> Result<Vec<TransactionEntity>, String> {
+        if *store_id == 1 {
+            let mut transactions = Vec::new();
+            for n in 1 .. 10 {
+                transactions.push(TransactionEntity::new(10.0, "test".to_string(), "origin".to_string(), n, NaiveDate::from_ymd(2016, 7, 8).and_hms(9, 10, 11), n));
+            }
+            return Ok(transactions)
+        }
+
+        Err("ThisIsAnError".to_string())
     }
+    fn set_payment_window_to_payed(&self, label: &str, store_id: &i32) -> Result<(), String> {Err("test".to_string())}
 }
 
 #[derive(Clone)]
-pub struct MockTransactionNetwork {
-
-}
+pub struct MockTransactionNetwork {}
 
 impl ITransactionNetworkDataSource for MockTransactionNetwork {
     fn follow_transactions_for_label(&self, label: &str, _: i32) -> std::result::Result<(f64, std::vec::Vec<TransactionEntity>), String> {
         let dt: NaiveDateTime = NaiveDate::from_ymd(2016, 7, 8).and_hms(9, 10, 11);
-        Ok((10.8, vec![TransactionEntity::new(10.0, "hash".to_string(), "origin".to_string(), 1, dt)]))
+        Ok((10.8, vec![TransactionEntity::new(10.0, "hash".to_string(), "origin".to_string(), 1, dt, 1)]))
     }
 }
 
