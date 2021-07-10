@@ -188,8 +188,8 @@ impl TransactionItem {
     pub fn get_transaction_status(&self) -> &TransactionStatus {
         &self.transaction_status
     }
-    pub fn get_transaction_type(&self) -> &TransactionStatus {
-        &self.transaction_status
+    pub fn get_transaction_type(&self) -> &TransactionType {
+        &self.transaction_type
     }
 }
 
