@@ -33,13 +33,13 @@ pub fn get_store_wallet_by_id(_id: &i32) -> Result<Shop, Error> {
 /// # Arguments
 ///
 /// * `enttiy` - A GeneratedPaymentRequestEntity object
-pub fn insert_payment_window(entity: &PaymentRequestEntity) -> Result<GeneratedPaymentRequestEntity, String> {
+pub fn insert_payment_window(entity: &PaymentRequestEntity) -> Result<GeneratedPaymentRequestEntity, DataSourceError> {
     use crate::schema::payment_window::dsl::{payment_window, id};
     let new_payment_window = NewPaymentRequest {label: entity.get_label(), amount: entity.get_amount(), store_id: entity.get_store_id()};
 
     match get_payment_window_by_label(entity.get_label(), entity.get_store_id()) {
-        Ok(payment_window_db) => return Err(super::entity::error::DataSourceError::AlreadyExistInDatabase(entity.get_label().to_string()).to_string()),
-        Err(e) => {}
+        Ok(_) => return Err(super::entity::error::DataSourceError::AlreadyExistInDatabase(entity.get_label().to_string())),
+        Err(_) => {}
     }
 
     diesel::insert_into(payment_window)
@@ -51,7 +51,7 @@ pub fn insert_payment_window(entity: &PaymentRequestEntity) -> Result<GeneratedP
 
     match get_store_wallet_by_id(&payment_window_row.store_id) {
         Ok(store_row) => Ok(GeneratedPaymentRequestEntity::new(payment_window_row.label, payment_window_row.amount, store_row.wallet_address, payment_window_row.store_id)),
-        Err(e) => Err(super::entity::error::DataSourceError::NotFoundInDatabase(entity.get_label().to_string(), entity.get_store_id().to_string()).to_string())
+        Err(_) => Err(super::entity::error::DataSourceError::NotFoundInDatabase(entity.get_label().to_string(), entity.get_store_id().to_string()))
     }
 }
 

@@ -14,7 +14,8 @@ pub enum DataSourceError {
     NotFoundInDatabase(String, String),
     #[error("[Low-2] The item '{0}', does already exist")]
     AlreadyExistInDatabase(String),
-    // AddressCouldNotBeMadeOnBlockchain,
+    #[error("[Low-2] The address could not be made for the current shop")]
+    AddressCouldNotBeMadeOnBlockchain,
     // RefundFailed,
     // ErrorBlockchain
 }
