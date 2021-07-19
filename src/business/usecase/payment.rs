@@ -9,7 +9,7 @@ pub struct PaymentUseCase {
 }
 
 impl PaymentUseCase {
-    pub fn create_payment_window(&self, payment_request_item: PaymentRequestItem) -> Result<GeneratedPaymentRequestItem, String> {
+    pub fn create_payment_window(&self, payment_request_item: &PaymentRequestItem) -> Result<GeneratedPaymentRequestItem, String> {
         let generated_payment_request_model = self.payment_repository.create_payment_window(payment_request_item.map_to_business())?;
         Ok(GeneratedPaymentRequestItem::map_to_presentation(generated_payment_request_model))
     }

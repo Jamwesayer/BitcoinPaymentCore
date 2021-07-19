@@ -15,11 +15,10 @@ impl Default for PaymentController {
 
 impl PaymentController {
     pub async fn create_payment_window(&self, payment_request_item: PaymentRequestItem) {
-        let store_id = payment_request_item.get_store_id().clone();
-        match self.payment_controller_service.create_payment_window(payment_request_item) {
+        match self.payment_controller_service.create_payment_window(&payment_request_item) {
             Ok(generated_payment_request_item) => {
                 println!("Address: {:?}", generated_payment_request_item.get_address());
-                self.payment_controller_service.follow_transaction_for_label(generated_payment_request_item, store_id).await
+                self.payment_controller_service.follow_transaction_for_label(generated_payment_request_item, *payment_request_item.get_store_id()).await
             },
             Err(e) => println!("{:?}", e)
         }

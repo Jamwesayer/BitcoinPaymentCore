@@ -18,7 +18,7 @@ impl Default for PaymentControllerService {
 
 impl PaymentControllerService {
 
-    pub fn create_payment_window(&self, payment_request_item: PaymentRequestItem) -> Result<GeneratedPaymentRequestItem, String> {
+    pub fn create_payment_window(&self, payment_request_item: &PaymentRequestItem) -> Result<GeneratedPaymentRequestItem, String> {
         self.payment_usecase.create_payment_window(payment_request_item)
     }
 

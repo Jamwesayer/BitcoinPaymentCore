@@ -26,8 +26,8 @@ impl<'a> PaymentRequestItem {
         &self.store_id
     }
 
-    pub fn map_to_business(self) -> PaymentRequest {
-        PaymentRequest::new(self.label, self.amount, self.store_id)
+    pub fn map_to_business(&self) -> PaymentRequest {
+        PaymentRequest::new(self.get_label().to_string(), *self.get_amount(), *self.get_store_id())
     }
 
 }

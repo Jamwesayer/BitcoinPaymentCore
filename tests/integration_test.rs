@@ -41,7 +41,7 @@ fn test_create_payment_window_success() {
     let payment_request_item = PaymentRequestItem::new("ThisShouldWork".to_string(), 99.99, 1);
     let expected_item = GeneratedPaymentRequestItem::new(payment_request_item.get_label().to_string(), *payment_request_item.get_amount(), "ThisShouldWorkNew".to_string());
 
-    assert_eq!(usecase.create_payment_window(payment_request_item).unwrap(), expected_item);
+    assert_eq!(usecase.create_payment_window(&payment_request_item).unwrap(), expected_item);
 }
 
 #[test]
@@ -53,7 +53,7 @@ fn test_create_payment_window_error() {
 
     let payment_request_item = PaymentRequestItem::new("ThisShouldNotWork".to_string(), 99.99, 1);
 
-    usecase.create_payment_window(payment_request_item).unwrap();
+    usecase.create_payment_window(&payment_request_item).unwrap();
 }
 
 #[test]
