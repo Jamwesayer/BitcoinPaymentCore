@@ -74,7 +74,7 @@ impl ITransactionRepository for TransactionRepository {
         Ok(transactions)
     }
 
-    fn save_transaction_to_database(&self, label: &str, store_id: &i32, transactions: Vec<Transaction>) -> Result<(), String> {
+    fn save_transaction_to_database(&self, label: &str, store_id: &i32, transactions: &Vec<Transaction>) -> Result<(), String> {
         let mut transaction_entities: Vec<TransactionEntity> = Vec::new();
         for transaction in transactions {
             transaction_entities.push(TransactionEntity::map_to_entity(transaction));

@@ -14,7 +14,7 @@ impl TransactionUseCase {
 
     pub fn get_transaction_by_transaction_id(&self, transaction_id: &str) -> Result<TransactionItem, String> {
         let transaction_model = self.transaction_repository.find_transaction_by_id(transaction_id)?;
-        Ok(TransactionItem::map_to_presentation(transaction_model))
+        Ok(TransactionItem::map_to_presentation(&transaction_model))
     }
 
     pub fn get_all_transactions(&self, store_id: &i32) -> Result<Vec<TransactionItem>, String> {
@@ -22,7 +22,7 @@ impl TransactionUseCase {
 
         let mut transaction_items = Vec::new();
         for transaction_model in transactions {
-            transaction_items.push(TransactionItem::map_to_presentation(transaction_model));
+            transaction_items.push(TransactionItem::map_to_presentation(&transaction_model));
         }
         Ok(transaction_items)
     }

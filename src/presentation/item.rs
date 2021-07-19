@@ -51,8 +51,8 @@ impl PaymentWindowSearchItem {
     pub fn get_store_id(&self) -> &i32 {
         &self.store_id
     }
-    pub fn map_to_business(self) -> PaymentWindowSearch {
-        PaymentWindowSearch::new(self.label, self.store_id)
+    pub fn map_to_business(&self) -> PaymentWindowSearch {
+        PaymentWindowSearch::new(self.get_label().to_string(), *self.get_store_id())
     }
 }
 
@@ -168,7 +168,7 @@ impl TransactionItem {
             transaction_type: _transaction_type
         }
     }
-    pub fn map_to_presentation(model: Transaction) -> Self {
+    pub fn map_to_presentation(model: &Transaction) -> Self {
         TransactionItem::new(*model.get_amount(), model.get_transaction_id().to_string(), model.get_origin_address().to_string(), *model.get_time_received(), *model.get_transaction_status(), *model.get_transaction_type())
     }
 
@@ -225,7 +225,7 @@ mod tests {
     fn translating_transaction_status_to_enum_transaction_status() {
         let dt: NaiveDateTime = NaiveDate::from_ymd(2016, 7, 8).and_hms(9, 10, 11);
         let transaction_model = Transaction::new(10.0, "Test".to_string(), "Address".to_string(), 1, dt, 1);
-        let transaction_item = TransactionItem::map_to_presentation(transaction_model);
+        let transaction_item = TransactionItem::map_to_presentation(&transaction_model);
 
         assert_eq!(transaction_item.transaction_status, TransactionStatus::Success);
     }
@@ -234,7 +234,7 @@ mod tests {
     fn translating_transaction_type_to_enum_transaction_type() {
         let dt: NaiveDateTime = NaiveDate::from_ymd(2016, 7, 8).and_hms(9, 10, 11);
         let transaction_model = Transaction::new(10.0, "Test".to_string(), "Address".to_string(), 1, dt, 1);
-        let transaction_item = TransactionItem::map_to_presentation(transaction_model);
+        let transaction_item = TransactionItem::map_to_presentation(&transaction_model);
 
         assert_eq!(transaction_item.transaction_type, TransactionType::Payment);
     }

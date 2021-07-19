@@ -44,7 +44,7 @@ impl TransactionEntity {
         &self.transaction_status_id
     }
 
-    pub fn map_to_entity(model: Transaction) -> Self {
+    pub fn map_to_entity(model: &Transaction) -> Self {
         TransactionEntity {
             amount: *model.get_amount(),
             transaction_id: model.get_transaction_id().to_string(),

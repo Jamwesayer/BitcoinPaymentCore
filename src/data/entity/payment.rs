@@ -9,7 +9,7 @@ pub struct PaymentRequestEntity {
 }
 
 impl PaymentRequestEntity {
-    pub fn map_to_entity(model: PaymentRequest) -> Self {
+    pub fn map_to_entity(model: &PaymentRequest) -> Self {
         PaymentRequestEntity {
             label: model.get_label().to_string(),
             amount: *model.get_amount(),
@@ -46,7 +46,7 @@ impl PaymentWindowSearchEntity {
     pub fn get_store_id(&self) -> &i32 {
         &self.store_id
     }
-    pub fn map_to_entity(model: PaymentWindowSearch) -> Self {
+    pub fn map_to_entity(model: &PaymentWindowSearch) -> Self {
         PaymentWindowSearchEntity {
             label: model.get_label().to_string(),
             store_id: *model.get_store_id()

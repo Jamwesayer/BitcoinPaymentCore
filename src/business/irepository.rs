@@ -55,5 +55,5 @@ pub trait ITransactionRepository {
     /// * `label` - A &str to identify the incoming transactions
     fn get_all_transactions(&self, store_id: &i32) -> Result<Vec<Transaction>, String>;
 
-    fn save_transaction_to_database(&self, label: &str, store_id: &i32, transactions: Vec<Transaction>) -> Result<(), String>;
+    fn save_transaction_to_database(&self, label: &str, store_id: &i32, transactions: &Vec<Transaction>) -> Result<(), String>;
 }
