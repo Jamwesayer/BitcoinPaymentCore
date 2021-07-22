@@ -16,7 +16,7 @@ pub trait IPaymentRepository {
     ///
     /// # Arguments
     ///
-    /// * `label` - A &str which will be used to identify the payment window
+    /// * `payment_search_model` - A model containing the name and store id
     fn check_payment_status(&self, payment_search_model: PaymentWindowSearch) -> Result<PaymentDetails, String>;
 
     /// Returns Result<String, String>
@@ -25,9 +25,16 @@ pub trait IPaymentRepository {
     ///
     /// # Arguments
     ///
-    /// * `label` - A &str which will be used to identify the specific label for which the payments has been done
+    /// * `payment_search_model` - A model containing the name and store id
     fn refund(&self, payment_search_model: PaymentWindowSearch) -> Result<Vec<Transaction>, String>;
 
+    /// Returns Result<(), String>
+    ///
+    /// Suspends a specific payment window
+    ///
+    /// # Arguments
+    ///
+    /// * `payment_search_model` - A model containing the name and store id
     fn suspend_payment_window(&self, payment_search_model: PaymentWindowSearch) -> Result<(), String>;
 }
 
