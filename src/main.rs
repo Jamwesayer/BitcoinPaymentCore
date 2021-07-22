@@ -1,3 +1,4 @@
+use payment_core::business::model::Store;
 use payment_core::presentation::controller::*;
 use payment_core::presentation::item::*;
 
@@ -6,6 +7,8 @@ use std::time::Duration;
 
 use clap::{Arg, App, SubCommand};
 
+const VERSION: &str = "0.1";
+
 #[tokio::main]
 async fn main() {
 
@@ -13,14 +16,12 @@ async fn main() {
     let transaction_controller = TransactionController::default();
 
     let matches = App::new("BTC Payment System")
-        .version("0.1")
+        .version(VERSION)
         .author("James Bal")
         .about("Handle BTC wallets, transaction and overviews")
         .subcommand(
             SubCommand::with_name("create-order")
             .about("Create an order")
-            .version("0.1")
-            .author("James Bal")
             .arg(Arg::with_name("label")
                 .required(true)
                 .index(1))
@@ -31,8 +32,6 @@ async fn main() {
         .subcommand(
             SubCommand::with_name("check-order")
             .about("Check a specific order")
-            .version("0.1")
-            .author("James Bal")
             .arg(Arg::with_name("label")
                 .required(true)
                 .index(1))
@@ -40,8 +39,6 @@ async fn main() {
         .subcommand(
             SubCommand::with_name("cancel-order")
             .about("Refund an order, this means that the order is manually cancelled")
-            .version("0.1")
-            .author("James Bal")
             .arg(Arg::with_name("label")
                 .required(true)
                 .index(1))
@@ -51,6 +48,18 @@ async fn main() {
             .about("Retrieve all transactions")
             .version("0.1")
             .author("James Bal")
+        )
+        .subcommand(
+            SubCommand::with_name("register")
+            .about("Retrieve all transactions")
+            .version("0.1")
+            .author("James Bal")
+            .arg(Arg::with_name("name")
+                .required(true)
+                .index(1))
+            .arg(Arg::with_name("address")
+                .required(true)
+                .index(1))
         )
         .get_matches();
 
@@ -82,6 +91,14 @@ async fn main() {
 
     if let Some(matches) = matches.subcommand_matches("get-transactions") {
         transaction_controller.get_all_transactions(&get_current_store_id());
+    }
+
+    if let Some(matches) = matches.subcommand_matches("register") {
+        let name = matches.value_of("name").unwrap().to_string();
+        let address = matches.value_of("address").unwrap().to_string();
+        let store = Store::new(name, address, "".to_string());
+
+        // register_controller.register(store)
     }
 }
 

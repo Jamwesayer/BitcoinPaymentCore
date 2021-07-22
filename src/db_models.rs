@@ -1,5 +1,5 @@
 use chrono;
-use crate::schema::{payment_window, transaction};
+use crate::schema::{payment_window, transaction, shop};
 
 #[derive(Insertable)]
 #[table_name = "payment_window"]
@@ -26,6 +26,14 @@ pub struct Shop {
     pub name: String,
     pub address: String,
     pub wallet_address: String
+}
+
+#[derive(Insertable)]
+#[table_name = "shop"]
+pub struct NewStore<'a> {
+    pub name: &'a str,
+    pub address: &'a str,
+    pub wallet_address: &'a str
 }
 
 #[derive(Insertable)]

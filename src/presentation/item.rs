@@ -1,4 +1,5 @@
 use chrono::NaiveDateTime;
+use diesel::IntoSql;
 use crate::business::model::*;
 
 #[derive(Debug, PartialEq)]
@@ -203,6 +204,40 @@ pub enum TransactionStatus {
 pub enum TransactionType {
     Payment,
     Refund
+}
+
+pub struct StoreItem {
+    name: String,
+    address: String,
+    wallet_address: String
+}
+
+impl StoreItem {
+    pub fn new(name: String, address: String, wallet_address: String) -> Self {
+        StoreItem {
+            name: name,
+            address: address,
+            wallet_address: wallet_address
+        }
+    }
+
+    pub fn get_name(&self) -> &str {
+        self.name.as_str()
+    }
+
+    pub fn get_address(&self) -> &str {
+        self.address.as_str()
+    }
+
+    pub fn get_wallet_address(&self) -> &str {
+        self.wallet_address.as_str()
+    }
+    pub fn map_to_business(&self) -> Store {
+        Store::new(self.get_name().to_string(), self.get_address().to_string(), self.get_wallet_address().to_string())
+    }
+    pub fn map_to_presentation(model: &Store) -> Self {
+        Self::new(model.get_name().to_string(), model.get_address().to_string(), model.get_wallet_address().to_string())
+    }
 }
 
 

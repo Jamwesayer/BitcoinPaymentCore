@@ -133,7 +133,6 @@ impl Transaction {
     pub fn get_amount(&self) -> &f64 {
         &self.amount
     }
-
     pub fn get_transaction_id(&self) -> &str {
         self.transaction_id.as_str()
     }
@@ -148,5 +147,33 @@ impl Transaction {
     }
     pub fn get_transaction_status(&self) -> &i32 {
         &self.transaction_status_id
+    }
+}
+
+pub struct Store {
+    name: String,
+    address: String,
+    wallet_address: String
+}
+
+impl Store {
+    pub fn new(name: String, address: String, wallet_address: String) -> Self {
+        Self {
+            name: name,
+            address: address,
+            wallet_address: wallet_address
+        }
+    }
+
+    pub fn get_name(&self) -> &str {
+        self.name.as_str()
+    }
+
+    pub fn get_address(&self) -> &str {
+        self.address.as_str()
+    }
+
+    pub fn get_wallet_address(&self) -> &str {
+        self.wallet_address.as_str()
     }
 }

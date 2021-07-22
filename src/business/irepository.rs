@@ -64,3 +64,10 @@ pub trait ITransactionRepository {
 
     fn save_transaction_to_database(&self, label: &str, store_id: &i32, transactions: &Vec<Transaction>) -> Result<(), String>;
 }
+
+pub trait IStoreRepository {
+
+    fn register_store(&self, store_item: Store) -> Result<Store, String>;
+    fn login(&self) -> Result<(), String>;
+
+}

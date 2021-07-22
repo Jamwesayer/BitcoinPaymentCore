@@ -3,6 +3,7 @@ use crate::data::blockchain_util as blockchain;
 use crate::data::database_util as database;
 use crate::data::entity::payment::*;
 use crate::data::entity::transaction::*;
+use crate::data::entity::store::*;
 
 //------------------------------------------------------------------------------------------------- Payment
 pub trait IPaymentDatabaseDataSource {
@@ -59,7 +60,7 @@ impl<'a> IPaymentDatabaseDataSource for PaymentDatabase {
 
 pub trait IPaymentNetworkDataSource {
     fn create_payment_window(&self, label: &str) -> Result<String, String>;
-    fn send_refund(&self, label: &str) -> Result<Vec::<TransactionEntity>, String>;
+    fn send_refund(&self, label: &str) -> Result<Vec<TransactionEntity>, String>;
 }
 
 pub struct PaymentNetwork {
@@ -81,7 +82,7 @@ impl IPaymentNetworkDataSource for PaymentNetwork {
         }
     }
 
-    fn send_refund(&self, label: &str) -> Result<Vec::<TransactionEntity>, String> {
+    fn send_refund(&self, label: &str) -> Result<Vec<TransactionEntity>, String> {
         blockchain::refund(label)
     }
 }
@@ -162,5 +163,33 @@ impl Default for TransactionNetwork {
 impl ITransactionNetworkDataSource for TransactionNetwork {
     fn follow_transactions_for_label(&self, label: &str, skip: i32) -> Result<(f64, Vec<TransactionEntity>), String>{
         blockchain::get_all_transactions_for_address_by_label_with_total(&label, skip)
+    }
+}
+
+// ---------------------------------------- Store
+
+pub trait IStoreDatabaseDatasource {
+    fn register_store(&self, register_store_entity: StoreEntity) -> Result<StoreEntity, String>;
+    fn login(&self) -> Result<(), String>;
+}
+pub struct StoreDatabase {}
+
+impl Default for StoreDatabase {
+    fn default() -> Self {
+        Self {}
+    }
+}
+
+
+impl IStoreDatabaseDatasource for StoreDatabase {
+    fn register_store(&self, register_store_entity: StoreEntity) -> Result<StoreEntity, String> {
+        match database::register_store(register_store_entity) {
+            Ok(store_entity) => Ok(store_entity),
+            Err(e) => Err(e.to_string())
+        }
+    }
+
+    fn login(&self) -> Result<(), String> {
+        Ok(())
     }
 }

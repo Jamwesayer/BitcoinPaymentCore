@@ -47,12 +47,12 @@ pub fn create_receiving_address(label: &str) -> Result<String, String> {
 
 /// Returns Result<String, String>
 ///
-/// It gathers al transactions with the given label, then sends transaction to the found addresses with the according amount minus the fee
+/// It gathers all transactions with the given label, then sends transaction to the found addresses with the according amount minus the fee
 ///
 /// # Arguments
 ///
 /// * `label` - A &str which will be used to identify the transactions done with the "transaction_id"
-pub fn refund(label: &str) -> Result<Vec::<TransactionEntity>, String> {
+pub fn refund(label: &str) -> Result<Vec<TransactionEntity>, String> {
     match get_all_transactions_for_address_by_label(label, None) {
         Ok(transactions) => {
             let mut transaction_entities: Vec<TransactionEntity> = Vec::new();
