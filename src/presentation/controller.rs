@@ -18,7 +18,7 @@ impl PaymentController {
         match self.payment_controller_service.create_payment_window(&payment_request_item) {
             Ok(generated_payment_request_item) => {
                 println!("Address: {:?}", generated_payment_request_item.get_address());
-                println!("qr_code = {:?}", generated_payment_request_item.create_qr_code_string());
+                generated_payment_request_item.generate_qr_code_image();
                 self.payment_controller_service.follow_transaction_for_label(generated_payment_request_item, *payment_request_item.get_store_id()).await
             },
             Err(e) => println!("{:?}", e)

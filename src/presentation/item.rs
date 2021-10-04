@@ -1,5 +1,6 @@
 use chrono::NaiveDateTime;
 use crate::business::model::*;
+use qrcode_generator::QrCodeEcc;
 
 #[derive(Debug, PartialEq)]
 pub struct PaymentRequestItem {
@@ -88,6 +89,10 @@ impl<'a> GeneratedPaymentRequestItem {
     // bitcoin:<address>[?amount=<amount>][?label=<label>][?message=<message>]
     pub fn create_qr_code_string(&self) -> String {
         format!("bitcoin:{}?amount={}&label={}", self.get_address(), self.get_amount(), self.get_label())
+    }
+
+    pub fn generate_qr_code_image(&self) {
+        qrcode_generator::to_png_to_file(self.create_qr_code_string(), QrCodeEcc::Low, 1024, format!("tests/data/order-{}.png", self.get_label())).unwrap();
     }
 
 }
