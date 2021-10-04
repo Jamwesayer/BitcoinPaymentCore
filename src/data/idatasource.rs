@@ -32,16 +32,16 @@ impl<'a> IPaymentDatabaseDataSource for PaymentDatabase {
     }
 
     fn check_payment_window_status(&self, payment_search_entity: PaymentWindowSearchEntity) -> Result<PaymentDetailsEntity, String>{
-        if let Ok(payment_window) = database::get_payment_window_by_label(payment_search_entity.get_label(), payment_search_entity.get_store_id()) {
-            match database::get_store_wallet_by_id(&payment_window.store_id) {
-                Ok(store) => {
-                    Ok(PaymentDetailsEntity::new(payment_window.label, payment_window.amount, store.wallet_address, payment_window.status_id))
-                },
-                Err(e) => Err(e.to_string())
-            }
-
-        } else {
-            Err("Error".to_string())
+        match database::get_payment_window_by_label(payment_search_entity.get_label(), payment_search_entity.get_store_id()) {
+            Ok(payment_window) => {
+                match database::get_store_wallet_by_id(&payment_window.store_id) {
+                    Ok(store) => {
+                        Ok(PaymentDetailsEntity::new(payment_window.label, payment_window.amount, store.wallet_address, payment_window.status_id))
+                    },
+                    Err(e) => Err(e.to_string())
+                }
+            },
+            Err(e) => Err(e.to_string())
         }
     }
     fn get_payment_window_by_label(&self, payment_search_entity: PaymentWindowSearchEntity) -> Result<(), String> {

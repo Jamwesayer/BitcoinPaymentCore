@@ -18,6 +18,7 @@ impl PaymentController {
         match self.payment_controller_service.create_payment_window(&payment_request_item) {
             Ok(generated_payment_request_item) => {
                 println!("Address: {:?}", generated_payment_request_item.get_address());
+                println!("qr_code = {:?}", generated_payment_request_item.create_qr_code_string());
                 self.payment_controller_service.follow_transaction_for_label(generated_payment_request_item, *payment_request_item.get_store_id()).await
             },
             Err(e) => println!("{:?}", e)
@@ -27,7 +28,7 @@ impl PaymentController {
     pub fn check_payment_status(&self, payment_search_item: PaymentWindowSearchItem) {
         match self.payment_controller_service.check_payment_status(payment_search_item) {
             Ok(payment_details_item) => println!("{:?}", payment_details_item),
-            Err(e) => println!("Error")
+            Err(e) => println!("{:?}", e)
         }
     }
 
@@ -66,3 +67,7 @@ impl TransactionController {
         }
     }
 }
+
+// pub struct StoreController {
+//     store_controller_service:
+// }

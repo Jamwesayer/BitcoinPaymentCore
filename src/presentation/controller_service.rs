@@ -1,6 +1,7 @@
 use crate::presentation::item::*;
 use crate::business::usecase::transaction::TransactionUseCase;
 use crate::business::usecase::payment::PaymentUseCase;
+use crate::business::usecase::store::StoreUseCase;
 
 pub struct PaymentControllerService {
     payment_usecase: PaymentUseCase,
@@ -58,5 +59,29 @@ impl TransactionControllerService {
     }
     pub fn get_all_transactions(&self, store_id: &i32) -> Result<Vec<TransactionItem>, String> {
         self.transaction_usecase.get_all_transactions(store_id)
+    }
+}
+
+// ---------------------------------- Store
+pub struct StoreControllerService {
+    store_usecase: StoreUseCase
+}
+
+impl Default for StoreControllerService {
+    fn default() -> Self {
+        Self {
+            store_usecase: StoreUseCase::default()
+        }
+    }
+}
+
+impl StoreControllerService {
+    pub fn register(&self) -> Result<StoreItem, String> {
+        let register = StoreItem::new("test".to_string(), "test".to_string(), "test".to_string());
+        self.store_usecase.register_store(register)
+    }
+
+    pub fn login() {
+
     }
 }

@@ -86,6 +86,11 @@ impl<'a> GeneratedPaymentRequestItem {
         GeneratedPaymentRequestItem::new(model.get_label().to_string(), *model.get_amount(), model.get_address().to_string())
     }
 
+    // bitcoin:<address>[?amount=<amount>][?label=<label>][?message=<message>]
+    pub fn create_qr_code_string(&self) -> String {
+        format!("bitcoin:{}?amount={}&label={}", self.get_address(), self.get_amount(), self.get_label())
+    }
+
 }
 
 #[derive(Debug, PartialEq)]

@@ -11,6 +11,4 @@ pub enum DataSourceError {
     AddressCouldNotBeMadeOnBlockchainError,
     #[error("[Low-2] Found the following error: {0}")]
     KnownError(Error)
-    // RefundFailed,
-    // ErrorBlockchain
 }

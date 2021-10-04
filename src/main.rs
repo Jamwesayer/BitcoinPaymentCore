@@ -57,9 +57,9 @@ async fn main() {
             .arg(Arg::with_name("name")
                 .required(true)
                 .index(1))
-            .arg(Arg::with_name("address")
-                .required(true)
-                .index(1))
+            // .arg(Arg::with_name("address")
+            //     .required(true)
+            //     .index(1))
         )
         .get_matches();
 
@@ -95,8 +95,8 @@ async fn main() {
 
     if let Some(matches) = matches.subcommand_matches("register") {
         let name = matches.value_of("name").unwrap().to_string();
-        let address = matches.value_of("address").unwrap().to_string();
-        let store = Store::new(name, address, "".to_string());
+        // let address = matches.value_of("address").unwrap().to_string();
+        // let store = Store::new(name, address, "test".to_string());
 
         // register_controller.register(store)
     }
