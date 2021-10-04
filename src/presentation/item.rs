@@ -1,5 +1,4 @@
 use chrono::NaiveDateTime;
-use diesel::IntoSql;
 use crate::business::model::*;
 
 #[derive(Debug, PartialEq)]
